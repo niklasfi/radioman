@@ -95,5 +95,24 @@ int main(){
 
         f_ptr f(Base::parse("16:30"));
         std::cout << *f << "\n";
+
+        ptime d1(date(2016, moy::Aug, 7), hours(14) + minutes(27) + seconds(13));
+        ptime d1r((*f)(d1, false));
+
+        std::cout << "d1: " << d1 << "\td1r:  " << d1r << "\n";
+        assert(d1r == ptime(date(2016, moy::Aug, 7), hours(16) + minutes(30)));
+
+        ptime d2(d1r);
+        ptime d2r((*f)(d2, false));
+
+        std::cout << "d2: " << d2 << "\td2r:  " << d2r << "\n";
+        assert(d2r == d2);
+
+        ptime d2rr((*f)(d2, true));
+
+        std::cout << "d2: " << d2 << "\td2rr: " << d2rr << "\n";
+        assert(d2rr == ptime(date(2016, moy::Aug, 8), hours(16) + minutes(30)));
+
+        std::cout << "OK\n\n";
     }
 }
