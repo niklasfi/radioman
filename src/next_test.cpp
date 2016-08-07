@@ -49,6 +49,8 @@ int main(){
 
         std::cout << "d3: " << d3 << "\td3rr: " << d3rr << "\n";
         assert(d3rr == d3r);
+
+        std::cout << "OK\n\n";
     }
 
     {
@@ -84,6 +86,8 @@ int main(){
 
         std::cout << "d3: " << d3 << "\td3rr: " << d3rr << "\n";
         assert(d3rr == d3r);
+
+        std::cout << "OK\n\n";
     }
 
     {
