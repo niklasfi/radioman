@@ -30,3 +30,6 @@ target_link_libraries(mycurl curl boost_system)
 
 add_executable(curl_asio curl_asio.cpp)
 target_link_libraries(curl_asio curl boost_system)
+
+add_executable(multi_thread multi_thread.cpp)
+target_link_libraries(multi_thread next curl pthread boost_date_time)
