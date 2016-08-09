@@ -38,6 +38,9 @@ void download_direct(const std::string& url, const std::string& destination, boo
     curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &dlData_direct);
 
     CURLcode success = curl_easy_perform(easyhandle);
+    if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
+        std::cout << "[ERR] " << destination << " " << curl_easy_strerror(success) << "\n";
+    }
 
     curl_easy_cleanup(easyhandle);
 }
@@ -60,6 +63,9 @@ void download_m3u(const std::string& url, const std::string& destination, boost:
     curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &m3u);
 
     CURLcode success = curl_easy_perform(easyhandle);
+    if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
+        std::cout << "[ERR] " << destination << " " << curl_easy_strerror(success) << "\n";
+    }
 
     curl_easy_cleanup(easyhandle);
 
@@ -191,6 +197,7 @@ public:
 
 int main(){
     CURLcode curl = curl_global_init(CURL_GLOBAL_ALL);
+    assert(curl == CURLE_OK);
 
     Scheduler* scheduler;
 
