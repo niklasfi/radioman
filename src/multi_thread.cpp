@@ -10,6 +10,8 @@
 
 #include "next.h"
 
+#include <boost/filesystem.hpp>
+
 class DlData_direct {
 public:
     std::ofstream destination;
@@ -169,7 +171,12 @@ public:
                 std::this_thread::sleep_for(std::chrono::microseconds(diff.total_microseconds()));
             }
 
-            std::thread thread(download_m3u, station.url, "/tmp/res/" + programme.station + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time), event.time + programme.duration);
+            std::string prefixPath = "/tmp/feedme-core/";
+
+            boost::filesystem::path dir(prefixPath);
+            boost::filesystem::create_directory(prefixPath);
+
+            std::thread thread(download_m3u, station.url, prefixPath + "/" + programme.station + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time), event.time + programme.duration);
             thread.detach();
 
             schedule.pop();
