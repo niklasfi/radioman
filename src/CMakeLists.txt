@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 2.8.11)
 project (neuro)
 
 set(Boost_USE_STATIC_LIBS "ON")
-set(BOOST_ROOT "/usr/local/boost-1.60.0")
+set(BOOST_ROOT "/usr/local/boost_1_61_0")
 find_package(Boost COMPONENTS system filesystem date_time REQUIRED)
 
 set(CMAKE_CXX_FLAGS "-std=c++14")
