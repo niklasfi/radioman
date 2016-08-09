@@ -212,14 +212,25 @@ int main(){
 
             {
                 P("1live", "1minute", "0S", minutes(2)),
+
                 P("br3", "1minute", "0S", minutes(2)),
 
                 P("ndr2", "1minute", "0S", minutes(2)),
 
                 P("wdr2", "1minute", "0S", minutes(2)),
+
                 P("wdr5", "1minute", "0S", minutes(2)),
+
+                P("wdr5", "U22", "(22:05 & [MON | TUE | WED | THU | FRI])", minutes(55)),
+                P("wdr5", "BerichteVonHeute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
+
+                P("wdr5", "Krimi", "(17:05 & SAT)", minutes(55)),
+                P("wdr5", "Dok5", "(11:05 & SUN)", minutes(55)),
+                P("wdr5", "Hörspiel", "(17:05 & SUN)", minutes(55)),
+                P("wdr5", "LeseLounge", "(20:05 & SUN)", minutes(55)),
+                P("wdr5", "LiederLounge", "(21:05 & SUN)", minutes(55)),
                 P("wdr5", "ZeitZeichen", "9:45", minutes(15)),
-                P("wdr5", "EchoDesTages", "18:30", minutes(30))
+                P("wdr5", "EchoDesTages", "18:30", minutes(30)),
             }
         );
     }
