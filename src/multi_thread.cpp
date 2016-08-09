@@ -134,11 +134,13 @@ public:
     Scheduler(const std::initializer_list<Station>& stations, const std::initializer_list<Programme>& programmes)
     {
         for(const auto& station: stations){
-            assert(std::get<1>(this->stations.insert({station.name, station})));
+            auto result = this->stations.insert({station.name, station});
+            assert(std::get<1>(result));
         }
 
         for(const auto& programme: programmes){
-            assert(std::get<1>(this->programmes.insert({{programme.station, programme.name}, programme})));
+            auto result = this->programmes.insert({std::make_tuple(programme.station, programme.name), programme});
+            assert(std::get<1>(result));
         }
     }
 
@@ -156,7 +158,7 @@ public:
             boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
             Event event = schedule.top();
 
-            auto programme_it = programmes.find({event.station, event.programme});
+            auto programme_it = programmes.find(std::make_tuple(event.station, event.programme));
             auto station_it = stations.find(event.station);
 
             assert(programme_it != programmes.end());
