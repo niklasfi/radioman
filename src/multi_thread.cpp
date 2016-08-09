@@ -120,7 +120,6 @@ private:
         //write received data to all of the sinks
         for(auto& sink: station->sinks){
             sink.destination->write(ptr, size * nmemb);
-            sink.destination->flush();
         }
 
         return size * nmemb;
