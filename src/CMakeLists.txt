@@ -6,7 +6,7 @@ project (neuro)
 
 set(Boost_USE_STATIC_LIBS "ON")
 set(BOOST_ROOT "/usr/local/boost-1.60.0")
-find_package(Boost)
+find_package(Boost COMPONENTS system filesystem date_time REQUIRED)
 
 set(CMAKE_CXX_FLAGS "-std=c++14")
 set(CMAKE_CXX_FLAGS "-W -Wall ${CMAKE_CXX_FLAGS}")
@@ -26,10 +26,10 @@ add_executable(next_test next_test.cpp)
 target_link_libraries(next_test next)
 
 add_executable(mycurl curl.cpp)
-target_link_libraries(mycurl curl boost_system)
+target_link_libraries(mycurl curl ${Boost_SYSTEM_LIBRARY})
 
 add_executable(curl_asio curl_asio.cpp)
-target_link_libraries(curl_asio curl boost_system)
+target_link_libraries(curl_asio curl ${Boost_SYSTEM_LIBRARY})
 
 add_executable(multi_thread multi_thread.cpp)
-target_link_libraries(multi_thread next curl pthread boost_date_time)
+target_link_libraries(multi_thread next curl pthread ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
