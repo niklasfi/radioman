@@ -265,7 +265,7 @@ public:
             boost::filesystem::path dir(prefixPath);
             boost::filesystem::create_directory(prefixPath);
 
-            std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time);
+            std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time) + ".mp3";
             std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
             station.attach(Sink(event.time + programme.duration, std::move(ofs)));
 
