@@ -210,6 +210,7 @@ public:
 };
 
 class Scheduler {
+    std::string destinationPath;
     std::vector<Station> stations;
     std::vector<Programme> programmes;
 
@@ -217,7 +218,8 @@ class Scheduler {
 
 
 public:
-    Scheduler(const std::initializer_list<ConfigurationStation>& cStations, const std::initializer_list<ConfigurationProgramme>& cProgrammes)
+    Scheduler(const std::string& destinationPath, const std::initializer_list<ConfigurationStation>& cStations, const std::initializer_list<ConfigurationProgramme>& cProgrammes):
+        destinationPath(destinationPath)
     {
         for(const auto& cStation: cStations){
             stations.emplace_back(stations.size(), cStation.name, cStation.url);
@@ -258,12 +260,12 @@ public:
                 std::this_thread::sleep_for(std::chrono::microseconds(diff.total_microseconds()));
             }
 
-            std::string prefixPath = "/tmp/feedme-core/";
+            std::string prefixPath = destinationPath + "/" + station.name + "-" + programme.name;
 
             boost::filesystem::path dir(prefixPath);
             boost::filesystem::create_directory(prefixPath);
 
-            std::string targetPath = prefixPath + "/" + station.name + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time);
+            std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time);
             std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
             station.attach(Sink(event.time + programme.duration, std::move(ofs)));
 
@@ -287,7 +289,7 @@ int main(){
 
         using boost::posix_time::minutes;
 
-        scheduler = new Scheduler(
+        scheduler = new Scheduler( "/var/www/feedme-core/media/",
             {
                 S("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u"),
 
