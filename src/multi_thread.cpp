@@ -310,16 +310,21 @@ int main(){
 
                 P("wdr5", "1minute", "0S", minutes(2)),
 
+                P("wdr5", "Profit", "(18:05 & [MON | TUE | WED | THU | FRI | SAT])", minutes(25)),
+                P("wdr5", "Echo des Tages", "18:30", minutes(30)),
+                P("wdr5", "Europamagazin", "(20:05 & TUE)", minutes(55)),
+                P("wdr5", "Tischgespräch", "(20:05 & WED)", minutes(55)),
+                P("wdr5", "Funkhausgespräche", "(20:05 & THU)", minutes(55)),
+                P("wdr5", "Das philosophische Radio", "(20:05 & FRI)", minutes(55)),
                 P("wdr5", "U22", "(22:05 & [MON | TUE | WED | THU | FRI])", minutes(55)),
-                P("wdr5", "BerichteVonHeute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
-
+                P("wdr5", "Berichte von heute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
                 P("wdr5", "Krimi", "(17:05 & SAT)", minutes(55)),
                 P("wdr5", "Dok5", "(11:05 & SUN)", minutes(55)),
+                P("wdr5", "Presseclub", "(12:00 & SUN)", minutes(60)),
                 P("wdr5", "Hörspiel", "(17:05 & SUN)", minutes(55)),
                 P("wdr5", "LeseLounge", "(20:05 & SUN)", minutes(55)),
                 P("wdr5", "LiederLounge", "(21:05 & SUN)", minutes(55)),
                 P("wdr5", "ZeitZeichen", "9:45", minutes(15)),
-                P("wdr5", "EchoDesTages", "18:30", minutes(30)),
             }
         );
     }
