@@ -296,17 +296,26 @@ int main(){
                 S("ndr2", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u"),
 
                 S("wdr2", "http://www.wdr.de/wdrlive/media/wdr2.m3u"),
+                S("wdr3", "http://www.wdr.de/wdrlive/media/wdr3.m3u"),
                 S("wdr5", "http://www.wdr.de/wdrlive/media/wdr5.m3u")
             },
 
             {
-                P("1live", "1minute", "0S", minutes(2)),
+                P("1live", "Krimi-Shortstory", "(23:05 & THU)", minutes(55)),
+                P("1live", "Domian", "(01:05 & [TUE | WED | THU | FRI | SAT])", minutes(55)),
+                P("1live", "DJ Session", "(00:00 & SUN)", minutes(180)),
+                P("1live", "Kassettendeck", "(23:05 & MON)", minutes(55)),
 
                 P("br3", "1minute", "0S", minutes(2)),
 
                 P("ndr2", "1minute", "0S", minutes(2)),
 
                 P("wdr2", "1minute", "0S", minutes(2)),
+
+		P("wdr3", "Hörspiel", "(19:04 & [MON | TUE | WED | THU | FRI])", minutes(56)),
+                P("wdr3", "ARD Radiofestival. Konzert", "(20:04 & [MON | TUE | WED | THU | FRI | SUN])", minutes(146)),
+                P("wdr3", "ARD Radiofestival. Kabarett", "(22:30 & SUN)", minutes(60)),
+                P("wdr3", "ARD Radiofestival. Lesung", "(22:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
 
                 P("wdr5", "1minute", "0S", minutes(2)),
 
