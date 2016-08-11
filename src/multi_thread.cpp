@@ -308,18 +308,18 @@ int main(){
                 P("1live", "DJ_Session", "(00:00 & SUN)", minutes(180)),
                 P("1live", "Kassettendeck", "(23:05 & MON)", minutes(55)),
 
-                P("br3", "1minute", "0S", minutes(2)),
+                //P("br3", "1minute", "0S", minutes(2)),
 
-                P("ndr2", "1minute", "0S", minutes(2)),
+                //P("ndr2", "1minute", "0S", minutes(2)),
 
-                P("wdr2", "1minute", "0S", minutes(2)),
+                //P("wdr2", "1minute", "0S", minutes(2)),
 
                 P("wdr3", "Hoerrspiel", "(19:04 & [MON | TUE | WED | THU | FRI])", minutes(56)),
                 P("wdr3", "ARD_Radiofestival._Konzert", "(20:04 & [MON | TUE | WED | THU | FRI | SUN])", minutes(146)),
                 P("wdr3", "ARD_Radiofestival._Kabarett", "(22:30 & SUN)", minutes(60)),
                 P("wdr3", "ARD_Radiofestival._Lesung", "(22:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
 
-                P("wdr5", "1minute", "0S", minutes(2)),
+                //P("wdr5", "1minute", "0S", minutes(2)),
 
                 P("wdr5", "Profit", "(18:05 & [MON | TUE | WED | THU | FRI | SAT])", minutes(25)),
                 P("wdr5", "Echo_des_Tages", "18:30", minutes(30)),
