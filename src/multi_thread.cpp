@@ -305,7 +305,7 @@ int main(){
             {
                 P("1live", "Krimi-Shortstory", "(23:05 & THU)", minutes(55)),
                 P("1live", "Domian", "(01:05 & [TUE | WED | THU | FRI | SAT])", minutes(55)),
-                P("1live", "DJ Session", "(00:00 & SUN)", minutes(180)),
+                P("1live", "DJ_Session", "(00:00 & SUN)", minutes(180)),
                 P("1live", "Kassettendeck", "(23:05 & MON)", minutes(55)),
 
                 P("br3", "1minute", "0S", minutes(2)),
@@ -328,7 +328,7 @@ int main(){
                 P("wdr5", "Funkhausgespraeche", "(20:05 & THU)", minutes(55)),
                 P("wdr5", "Das_philosophische Radio", "(20:05 & FRI)", minutes(55)),
                 P("wdr5", "U22", "(22:05 & [MON | TUE | WED | THU | FRI])", minutes(55)),
-                P("wdr5", "Berichte von heute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
+                P("wdr5", "Berichte_von_heute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
                 P("wdr5", "Krimi", "(17:05 & SAT)", minutes(55)),
                 P("wdr5", "Dok5", "(11:05 & SUN)", minutes(55)),
                 P("wdr5", "Presseclub", "(12:00 & SUN)", minutes(60)),
