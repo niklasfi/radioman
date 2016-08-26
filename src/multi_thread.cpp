@@ -256,7 +256,8 @@ public:
             boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
             auto diff = (event.time - now);
             if(diff.total_microseconds() > 0){
-                std::cout << "sleeping for " << diff << " for " << station.name << "-" << programme.name << "\n";
+                //std::cout << "sleeping for " << diff << " for " << station.name << "-" << programme.name << "\n";
+                std::cout << event.time << " SLEEP " << station.name << "-" << programme.name << " for " << diff << "\n";
                 std::this_thread::sleep_for(std::chrono::microseconds(diff.total_microseconds()));
             }
 
@@ -268,6 +269,8 @@ public:
             std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time) + ".mp3";
             std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
             station.attach(Sink(event.time + programme.duration, std::move(ofs)));
+
+            std::cout << event.time << " START " << station.name << "-" << programme.name << " for " << programme.duration << "\n";
 
             schedule.pop();
 
