@@ -85,14 +85,16 @@ private:
 //make sure to acquire the mutex before accessing `sinks`
     std::unique_ptr<std::mutex> sinks_mutex;
     std::vector<Sink> sinks;
+//owned by the main/schedule management thread
+    std::thread thread;
 
 public:
     void spawn_direct(const std::string& url){
-        std::thread(&Station::download_direct_loop, this, url).detach();
+        this->thread = std::thread(&Station::download_direct_loop, this, url); //.detach();
     }
 
     void spawn_m3u(const std::string& url){
-        std::thread(&Station::download_m3u_loop, this, url).detach();
+        this->thread = std::thread(&Station::download_m3u_loop, this, url); //.detach();
     }
 
     void attach(Sink&& sink){
