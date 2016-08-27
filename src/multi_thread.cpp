@@ -166,6 +166,8 @@ private:
         curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_callback_m3u);
         curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &m3u);
 
+        curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, 5);
+
         //std::cout << name << " m3u download starts\n";
         CURLcode success = curl_easy_perform(easyhandle);
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
