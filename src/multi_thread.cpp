@@ -85,6 +85,8 @@ private:
 //make sure to acquire the mutex before accessing `sinks`
     std::unique_ptr<std::mutex> sinks_mutex;
     std::vector<Sink> sinks;
+    boost::posix_time::ptime last_progress_time;
+    curl_off_t last_progress_bytes;
 //owned by the main/schedule management thread
     std::thread thread;
 
@@ -107,7 +109,10 @@ public:
         name(name),
         original_url(original_url),
         sinks_mutex(new std::mutex()),
-        sinks()
+        sinks(),
+        last_progress_time(boost::posix_time::not_a_date_time),
+        last_progress_bytes(0),
+        thread()
     {}
 private:
     static size_t write_callback_direct(char *ptr, size_t size, size_t nmemb, void *userdata){
@@ -135,6 +140,32 @@ private:
         return size * nmemb;
     }
 
+    static int progress_callback_direct(void* userdata, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow){
+        (void) dltotal;
+        (void) ultotal;
+        (void) ulnow;
+
+        Station* station = static_cast<Station*>(userdata);
+        boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
+
+        if(station->last_progress_time.is_not_a_date_time() || dlnow != station->last_progress_bytes){
+            //std::cout << "dT: " << (now - station->last_progress_time) << "\n";
+
+            station->last_progress_time = now;
+            station->last_progress_bytes = dlnow;
+            return 0;
+    }
+        if(now - station->last_progress_time > boost::posix_time::seconds(5)){
+            std::cout << "[ERR] " << station->name << " info timeout\n";
+
+            station->last_progress_time = boost::posix_time::not_a_date_time;
+            station->last_progress_bytes = 0;
+            return -1;
+        }
+
+        return 0;
+    }
+
     void download_direct(const std::string& url){
         CURL* easyhandle = curl_easy_init();
         curl_easy_setopt(easyhandle, CURLOPT_URL, url.c_str());
@@ -142,7 +173,12 @@ private:
         curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_callback_direct);
         curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
 
-        //std::cout << name << " direct download starts\n";
+        curl_easy_setopt(easyhandle, CURLOPT_XFERINFOFUNCTION, progress_callback_direct);
+        curl_easy_setopt(easyhandle, CURLOPT_XFERINFODATA, this);
+
+        curl_easy_setopt(easyhandle, CURLOPT_NOPROGRESS, 0L);
+
+        //std::cout << name << " direct download starts: " << url << "\n";
         CURLcode success = curl_easy_perform(easyhandle);
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
             std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << "\n";
