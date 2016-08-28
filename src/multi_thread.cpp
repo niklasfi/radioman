@@ -153,7 +153,7 @@ private:
         boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
 
         if(station->last_progress_time.is_not_a_date_time() && dlnow > 0){
-            std::cout << "[OK ] " << station->name << " direct first packet received" << std::endl;
+            std::cout << "[OK ] " << std::left << std::setw(8) << station->name << " direct first packet received" << std::endl;
 
             station->last_progress_time = now;
             station->last_progress_bytes = dlnow;
@@ -168,7 +168,7 @@ private:
             return 0;
         }
         if(now - station->last_progress_time > boost::posix_time::seconds(station->timeout_direct)){
-            std::cout << "[ERR] " << station->name << " direct info timeout" << std::endl;
+            std::cout << "[ERR] " << std::left << std::setw(8) << station->name << " direct info timeout" << std::endl;
 
             station->last_progress_time = boost::posix_time::not_a_date_time;
             station->last_progress_bytes = 0;
@@ -193,7 +193,7 @@ private:
         //std::cout << name << " direct download starts: " << url << std::endl;
         CURLcode success = curl_easy_perform(easyhandle);
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << std::endl;
+            std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
         }
 
         curl_easy_cleanup(easyhandle);
@@ -221,13 +221,13 @@ private:
         curl_easy_cleanup(easyhandle);
 
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << std::endl;
+            std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
             return;
         }
 
         bool url_found = false;
 
-        std::cout << "[OK ] " << name << " m3u fetched" << std::endl;
+        std::cout << "[OK ] " << std::left << std::setw(8) << name << " m3u fetched" << std::endl;
 
         size_t begin = 0; size_t end = m3u.find_first_of("\r\n", begin);
         while(begin != std::string::npos){
@@ -244,7 +244,7 @@ private:
         }
 
         if (!url_found){
-            std::cout << "[ERR] " << name << "no url found in m3u file" << std::endl;
+            std::cout << "[ERR] " << std::left << std::setw(8) << name << "no url found in m3u file" << std::endl;
         }
     }
 
