@@ -193,9 +193,8 @@ private:
         std::cout << "[OK ] " << std::left << std::setw(8) << name << " performing direct request to " << url << std::endl;
 
         CURLcode success = curl_easy_perform(easyhandle);
-        if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
-        }
+
+        std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
 
         curl_easy_cleanup(easyhandle);
     }
