@@ -152,7 +152,15 @@ private:
         Station* station = static_cast<Station*>(userdata);
         boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
 
-        if(station->last_progress_time.is_not_a_date_time() || dlnow != station->last_progress_bytes){
+        if(station->last_progress_time.is_not_a_date_time() && dlnow > 0){
+            std::cout << "[OK ] " << station->name << " direct first packet received" << std::endl;
+
+            station->last_progress_time = now;
+            station->last_progress_bytes = dlnow;
+            return 0;
+        }
+
+        if(dlnow != station->last_progress_bytes){
             //std::cout << "dT: " << (now - station->last_progress_time) << std::endl;
 
             station->last_progress_time = now;
@@ -160,7 +168,7 @@ private:
             return 0;
         }
         if(now - station->last_progress_time > boost::posix_time::seconds(station->timeout_direct)){
-            std::cout << "[ERR] " << station->name << " info timeout" << std::endl;
+            std::cout << "[ERR] " << station->name << " direct info timeout" << std::endl;
 
             station->last_progress_time = boost::posix_time::not_a_date_time;
             station->last_progress_bytes = 0;
@@ -210,11 +218,14 @@ private:
 
         //std::cout << name << " m3u download starts" << std::endl;
         CURLcode success = curl_easy_perform(easyhandle);
+        curl_easy_cleanup(easyhandle);
+
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
             std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << std::endl;
+            return;
         }
 
-        curl_easy_cleanup(easyhandle);
+        std::cout << "[OK ] " << name << " m3u fetched" << std::endl;
 
         size_t begin = 0; size_t end = m3u.find_first_of("\r\n", begin);
         while(begin != std::string::npos){
