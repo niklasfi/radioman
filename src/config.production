@@ -1,5 +1,5 @@
 # where should the files go?
-destinationPath = "/tmp/feedme-core-media/"
+destinationPath = "/var/www/feedme-core/media/"
 
 # the schedule consists of stations and programmes.
 # - a programme is a three-tuple: ( identifier, schedule, duration), where
