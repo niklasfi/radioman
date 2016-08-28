@@ -1,0 +1,94 @@
+# where should the files go?
+destinationPath = "/tmp/feedme-core-media/"
+
+# the schedule consists of stations and programmes.
+# - a programme is a three-tuple: ( identifier, schedule, duration), where
+#   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the station identifier to determine the output paths for recordings
+#   - schedule is a parsable schedule string
+#   - duration is an integer indicating the length of the recording in minutes
+# - a station is a three-tuple: ( identifier, m3u url, programmes)
+#   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the programme identifier to determine the output paths for recordings
+#   - m3u url is a string containing the url of the m3u files
+#   - programmes is a list of programmes
+
+schedule: (
+    ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
+      #("1minute", "0S", 2),
+      ("Nachrichten", "0M", 5),
+      ("Krimi-Shortstory", "(23:05 & THU)", 55),
+      ("Domian", "(01:05 & [TUE | WED | THU | FRI | SAT])", 55),
+      ("DJ_Session", "(00:00 & SUN)", 180),
+      ("Kassettendeck", "(23:05 & MON)", 55)
+    )),
+    ("br2", "http://streams.br.de/bayern2_2.m3u", (
+      ("Nachrichten", "0M", 5),
+      ("radioSpitzen", "(14:05 & FRI)", 55)
+    )),
+    ("br3", "http://streams.br.de/bayern3_2.m3u", (
+      ("Nachrichten", "0M", 5)
+    )),
+    ("dlf", "http://www.dradio.de/streaming/dlf.m3u", (
+      ("Nachrichten", "0M", 10),
+      ("Andruck", "(19:15 & MON)", 45),
+      ("Aus Kultur- und Sozialwissenschaften", "(20:10 & THU)", 50),
+      ("Computer und Kommunikation", "(16:30 & SAT)", 30),
+      ("Das Feature", "(19:15 & TUE)", 45),
+      ("Querköpfe", "(21:05 & WED)", 55),
+      ("Das Feature", "(20:10 & FRI)", 45),
+      ("Das war der Tag", "(23:10 & [MON | TUE | WED | THU | FRI])", 50),
+      ("Forschung aktuell", "(16:35 & [MON | TUE | WED | THU | FRI])", 25),
+      ("Hintergrund", "18:40", 20),
+      ("Mitternachtskrimi", "(00:05 & SAT)", 55)
+    )),
+    ("ndr2", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u", (
+      ("Nachrichten", "0M", 5)
+    )),
+    ("ndrinfo", "http://www.ndr.de/resources/metadaten/audio/m3u/ndrinfo.m3u", (
+      ("Nachrichten", "0M", 5),
+      ("Intensiv-Station", "(21:05 & MON)", 55),
+      ("Das Kriminalhörspiel", "(21:05 & SAT)", 55),
+      ("Echo der Welt", "(13:30 & SUN)", 30),
+      ("Die Reportage", "(17:30 & SUN)", 30),
+      ("Das Hörspiel", "(21:05 & SUN)", 85)
+    )),
+    ("wdr2", "http://www.wdr.de/wdrlive/media/wdr2.m3u", (
+      ("Nachrichten", "0M", 5),
+      ("MonTalk", "(19:05 & MON)", 115),
+      ("Zugabe", "(22:30 & FRI)", 60),
+      ("In Concert", "(23:05 & FRI)", 55)
+    )),
+    ("wdr3", "http://www.wdr.de/wdrlive/media/wdr3.m3u", (
+      ("Nachrichten", "0M", 5),
+      ("Hörspiel", "(19:04 & [MON | TUE | WED | THU | FRI])", 56),
+      ("ARD Radiofestival. Konzert", "(20:04 & [MON | TUE | WED | THU | FRI | SUN])", 146),
+      ("ARD Radiofestival. Kabarett", "(22:30 & SUN)", 60),
+      ("ARD Radiofestival. Lesung", "(22:30 & [MON | TUE | WED | THU | FRI])", 30)
+    )),
+    ("wdr5", "http://www.wdr.de/wdrlive/media/wdr5.m3u", (
+      ("Nachrichten", "0M", 5),
+      ("Profit", "(18:05 & [MON | TUE | WED | THU | FRI | SAT])", 25),
+      ("Echo des Tages", "18:30", 30),
+      ("Europamagazin", "(20:05 & TUE)", 55),
+      ("Tischgespräch", "(20:05 & WED)", 55),
+      ("Funkhausgespräche", "(20:05 & THU)", 55),
+      ("Das philosophische Radio", "(20:05 & FRI)", 55),
+      ("U22", "(22:05 & [MON | TUE | WED | THU | FRI])", 55),
+      ("Berichte von heute", "(23:30 & [MON | TUE | WED | THU | FRI])", 30),
+      ("Satire Deluxe", "(11:05 & SAT)", 55),
+      ("Krimi am Samstag", "(17:05 & SAT)", 55),
+      ("MusikBonus", "(23:05 & SAT)", 55),
+      ("Dok5", "(11:05 & SUN)", 55),
+      ("Presseclub", "(12:00 & SUN)", 60),
+      ("Hörspiel", "(17:05 & SUN)", 55),
+      ("LeseLounge", "(20:05 & SUN)", 55),
+      ("LiederLounge", "(21:05 & SUN)", 55),
+      ("ZeitZeichen", "9:45", 15)
+    ))
+)
+
+
+# curl timeouts
+# timeoutM3U: long which determines the maximum total length of an m3u request in seconds
+timeoutM3U = 5L
+# tiemoutDirect: long which determines the maximum acceptable time without any new data being received in seconds
+timeoutDirect = 5L

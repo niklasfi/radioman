@@ -32,4 +32,4 @@ add_executable(curl_asio curl_asio.cpp)
 target_link_libraries(curl_asio curl ${Boost_SYSTEM_LIBRARY})
 
 add_executable(multi_thread multi_thread.cpp)
-target_link_libraries(multi_thread next curl pthread ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(multi_thread next curl pthread config++ ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})

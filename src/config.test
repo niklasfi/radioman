@@ -1,0 +1,26 @@
+# where should the files go?
+destinationPath = "/tmp/feedme-core-media/"
+
+# the schedule consists of stations and programmes.
+# - a programme is a three-tuple: ( identifier, schedule, duration), where
+#   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the station identifier to determine the output paths for recordings
+#   - schedule is a parsable schedule string
+#   - duration is an integer indicating the length of the recording in minutes
+# - a station is a three-tuple: ( identifier, m3u url, programmes)
+#   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the programme identifier to determine the output paths for recordings
+#   - m3u url is a string containing the url of the m3u files
+#   - programmes is a list of programmes
+
+schedule: (
+    ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
+      ("1minute", "0S", 2),
+      ("Nachrichten", "0M", 5)
+    ))
+)
+
+
+# curl timeouts
+# timeoutM3U: long which determines the maximum total length of an m3u request in seconds
+timeoutM3U = 5L
+# tiemoutDirect: long which determines the maximum acceptable time without any new data being received in seconds
+timeoutDirect = 5L

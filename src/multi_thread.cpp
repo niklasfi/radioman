@@ -1,4 +1,5 @@
 #include <curl/curl.h>
+#include <libconfig.h++>
 
 #include <iostream>
 #include <sstream>
@@ -79,7 +80,8 @@ public:
     const size_t id;
     const std::string name;
     const std::string original_url;
-
+    const long timeout_m3u;
+    const long timeout_direct;
 private:
 //owned and (predominantly) managed by the cURL thread
 //make sure to acquire the mutex before accessing `sinks`
@@ -104,10 +106,12 @@ public:
         std::lock_guard<std::mutex> lock(*sinks_mutex);
         sinks.emplace_back(std::move(sink));
     }
-    Station(size_t id, const std::string& name, const std::string& original_url):
+    Station(size_t id, const std::string& name, const std::string& original_url, long timeout_m3u, long timeout_direct):
         id(id),
         name(name),
         original_url(original_url),
+        timeout_m3u(timeout_m3u),
+        timeout_direct(timeout_direct),
         sinks_mutex(new std::mutex()),
         sinks(),
         last_progress_time(boost::posix_time::not_a_date_time),
@@ -154,8 +158,8 @@ private:
             station->last_progress_time = now;
             station->last_progress_bytes = dlnow;
             return 0;
-    }
-        if(now - station->last_progress_time > boost::posix_time::seconds(5)){
+        }
+        if(now - station->last_progress_time > boost::posix_time::seconds(station->timeout_direct)){
             std::cout << "[ERR] " << station->name << " info timeout\n";
 
             station->last_progress_time = boost::posix_time::not_a_date_time;
@@ -202,7 +206,7 @@ private:
         curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_callback_m3u);
         curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &m3u);
 
-        curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, 5);
+        curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout_m3u);
 
         //std::cout << name << " m3u download starts\n";
         CURLcode success = curl_easy_perform(easyhandle);
@@ -258,19 +262,158 @@ class Scheduler {
 
 
 public:
-    Scheduler(const std::string& destinationPath, const std::initializer_list<ConfigurationStation>& cStations, const std::initializer_list<ConfigurationProgramme>& cProgrammes):
-        destinationPath(destinationPath)
-    {
-        for(const auto& cStation: cStations){
-            stations.emplace_back(stations.size(), cStation.name, cStation.url);
+    Scheduler():
+        destinationPath(),
+        stations(),
+        programmes(),
+        schedule()
+    {}
+
+    int readConfig(const std::string& config_path){
+        using namespace libconfig;
+
+        Config cfg;
+
+        try
+        {
+            cfg.readFile(config_path.c_str());
+        }
+        catch(const FileIOException &fioex)
+        {
+            std::cerr << "I/O error while reading file." << std::endl;
+            return(EXIT_FAILURE);
+        }
+        catch(const ParseException &pex)
+        {
+            std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
+                    << " - " << pex.getError() << std::endl;
+            return(EXIT_FAILURE);
         }
 
-        for(const auto& cProgramme: cProgrammes){
-            auto station_it = std::find_if(stations.begin(), stations.end(), [&cProgramme](const Station& station){return station.name == cProgramme.station;});
-            assert(station_it != stations.end());
-
-            programmes.emplace_back(std::distance(stations.begin(), station_it), programmes.size(), cProgramme.name, cProgramme.next, cProgramme.duration);
+        try
+        {
+            destinationPath = static_cast<const char*>(cfg.lookup("destinationPath"));
         }
+        catch(const SettingNotFoundException &nfex)
+        {
+            std::cerr << "No 'destinationPath' setting in configuration file.\n";
+            return(EXIT_FAILURE);
+        }
+
+        long timeout_m3u;
+        long timeout_direct;
+
+        try
+        {
+            timeout_m3u = cfg.lookup("timeoutM3U");
+        }
+        catch(const SettingNotFoundException &nfex)
+        {
+            std::cerr << "No 'timeoutM3U' setting in configuration file.\n";
+            return(EXIT_FAILURE);
+        }
+
+        try
+        {
+            timeout_direct = cfg.lookup("timeoutDirect");
+        }
+        catch(const SettingNotFoundException &nfex)
+        {
+            std::cerr << "No 'timeoutDirect' setting in configuration file.\n";
+            return(EXIT_FAILURE);
+        }
+
+        try
+        {
+            const Setting& schedule_setting = cfg.lookup("schedule");
+
+            int station_count = schedule_setting.getLength();
+            for(int i = 0; i < station_count; ++i){
+                const Setting& station_setting = schedule_setting[i];
+
+                std::string station_identifier;
+                std::string station_url;
+
+                try
+                {
+                    station_identifier = static_cast<const char*>(station_setting[0]);
+                }
+                catch(const SettingNotFoundException &nfex)
+                {
+                    std::cerr << "Station without identifier found\n";
+                    return(EXIT_FAILURE);
+                }
+
+                try
+                {
+                    station_url = static_cast<const char*>(station_setting[1]);
+                }
+                catch(const SettingNotFoundException &nfex)
+                {
+                    std::cerr << "Station " << station_identifier << " has no URL\n";
+                    return(EXIT_FAILURE);
+                }
+                stations.emplace_back(stations.size(), station_identifier, station_url, timeout_m3u, timeout_direct);
+
+                try
+                {
+                    const Setting& programmes_setting = station_setting[2];
+
+                    int programme_count = programmes_setting.getLength();
+                    for(int j = 0; j < programme_count; ++j){
+                        const Setting& programme_setting = programmes_setting[j];
+
+                        std::string programme_identifier;
+                        std::string programme_schedule;
+                        int programme_duration;
+
+                        try
+                        {
+                            programme_identifier = static_cast<const char*>(programme_setting[0]);
+                        }
+                        catch(const SettingNotFoundException &nfex)
+                        {
+                            std::cerr << "Programme without identifier found for station " << station_identifier << "\n";
+                            return(EXIT_FAILURE);
+                        }
+
+                        try
+                        {
+                            programme_schedule = static_cast<const char*>(programme_setting[1]);
+                        }
+                        catch(const SettingNotFoundException &nfex)
+                        {
+                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no schedule string\n";
+                            return(EXIT_FAILURE);
+                        }
+
+                        try
+                        {
+                            programme_duration = programme_setting[2];
+                        }
+                        catch(const SettingNotFoundException &nfex)
+                        {
+                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no duration\n";
+                            return(EXIT_FAILURE);
+                        }
+
+                        programmes.emplace_back(stations.size() - 1, programmes.size(), programme_identifier, NextFunctor::Base::parse(programme_schedule), boost::posix_time::minutes(programme_duration));
+                    }
+                }
+                catch(const SettingNotFoundException &nfex)
+                {
+                    std::cerr << "Station " << station_identifier << " has no programmes\n";
+                    return(EXIT_FAILURE);
+                }
+            }
+        }
+        catch(const SettingNotFoundException &nfex)
+        {
+            std::cerr << "No 'schedule' setting in configuration file.\n";
+            return(EXIT_FAILURE);
+        }
+
+        return EXIT_SUCCESS;
     }
 
     void run(){
@@ -304,7 +447,7 @@ public:
             std::string prefixPath = destinationPath + "/" + station.name + "-" + programme.name;
 
             boost::filesystem::path dir(prefixPath);
-            boost::filesystem::create_directory(prefixPath);
+            boost::filesystem::create_directories(prefixPath);
 
             std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time) + ".mp3";
             std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
@@ -320,119 +463,21 @@ public:
     }
 };
 
-int main(){
+int main(int argc, const char* argv[]){
+    if(argc != 2){
+        std::cout << "usage: " << argv[0] << " configuration_path\n";
+        return -1;
+    }
+
+    Scheduler scheduler;
+
+    if(scheduler.readConfig(argv[1]) != EXIT_SUCCESS){
+        std::cout << "parsing configuration file " << argv[1] << " failed.\nexiting\n";
+        return -1;
+    }
+
     CURLcode curl = curl_global_init(CURL_GLOBAL_ALL);
     assert(curl == CURLE_OK);
 
-    Scheduler* scheduler;
-
-    {
-        using P = ConfigurationProgramme;
-        using S = ConfigurationStation;
-
-        using boost::posix_time::minutes;
-
-        scheduler = new Scheduler( "/var/www/feedme-core/media/",
-            {
-                S("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u"),
-
-                S("br2", "http://streams.br.de/bayern2_2.m3u"),
-                S("br3", "http://streams.br.de/bayern3_2.m3u"),
-
-                S("dlf", "http://www.dradio.de/streaming/dlf.m3u"),
-
-                S("ndr2", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u"),
-                S("ndrinfo", "http://www.ndr.de/resources/metadaten/audio/m3u/ndrinfo.m3u"),
-
-                S("wdr2", "http://www.wdr.de/wdrlive/media/wdr2.m3u"),
-                S("wdr3", "http://www.wdr.de/wdrlive/media/wdr3.m3u"),
-                S("wdr5", "http://www.wdr.de/wdrlive/media/wdr5.m3u")
-            },
-
-            {
-                P("1live", "Nachrichten", "0M", minutes(5)),
-                P("1live", "Krimi-Shortstory", "(23:05 & THU)", minutes(55)),
-                P("1live", "Domian", "(01:05 & [TUE | WED | THU | FRI | SAT])", minutes(55)),
-                P("1live", "DJ_Session", "(00:00 & SUN)", minutes(180)),
-                P("1live", "Kassettendeck", "(23:05 & MON)", minutes(55)),
-
-                P("br2", "Nachrichten", "0M", minutes(5)),
-                P("br2", "radioSpitzen", "(14:05 & FRI)", minutes(55)),
-
-                P("br3", "Nachrichten", "0M", minutes(5)),
-
-                P("ndr2", "Nachrichten", "0M", minutes(5)),
-
-                P("ndrinfo", "Nachrichten", "0M", minutes(5)),
-                P("ndrinfo", "Intensiv-Station", "(21:05 & MON)", minutes(55)),
-                P("ndrinfo", "Das Kriminalhörspiel", "(21:05 & SAT)", minutes(55)),
-                P("ndrinfo", "Echo der Welt", "(13:30 & SUN)", minutes(30)),
-                P("ndrinfo", "Die Reportage", "(17:30 & SUN)", minutes(30)),
-                P("ndrinfo", "Das Hörspiel", "(21:05 & SUN)", minutes(85)),
-
-                P("dlf", "Nachrichten", "0M", minutes(10)),
-                P("dlf", "Andruck", "(19:15 & MON)", minutes(45)),
-                P("dlf", "Aus Kultur- und Sozialwissenschaften", "(20:10 & THU)", minutes(50)),
-                P("dlf", "Computer und Kommunikation", "(16:30 & SAT)", minutes(30)),
-                P("dlf", "Das Feature", "(19:15 & TUE)", minutes(45)),
-                P("dlf", "Querköpfe", "(21:05 & WED)", minutes(55)),
-                P("dlf", "Das Feature", "(20:10 & FRI)", minutes(45)),
-                P("dlf", "Das war der Tag", "(23:10 & [MON | TUE | WED | THU | FRI])", minutes(50)),
-                P("dlf", "Forschung aktuell", "(16:35 & [MON | TUE | WED | THU | FRI])", minutes(25)),
-                P("dlf", "Hintergrund", "18:40", minutes(20)),
-                P("dlf", "Mitternachtskrimi", "(00:05 & SAT)", minutes(55)),
-
-                P("wdr2", "Nachrichten", "0M", minutes(5)),
-                P("wdr2", "MonTalk", "(19:05 & MON)", minutes(115)),
-                P("wdr2", "Zugabe", "(22:30 & FRI)", minutes(60)),
-                P("wdr2", "In Concert", "(23:05 & FRI)", minutes(55)),
-
-                P("wdr3", "Nachrichten", "0M", minutes(5)),
-                P("wdr3", "Hörspiel", "(19:04 & [MON | TUE | WED | THU | FRI])", minutes(56)),
-                P("wdr3", "ARD Radiofestival. Konzert", "(20:04 & [MON | TUE | WED | THU | FRI | SUN])", minutes(146)),
-                P("wdr3", "ARD Radiofestival. Kabarett", "(22:30 & SUN)", minutes(60)),
-                P("wdr3", "ARD Radiofestival. Lesung", "(22:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
-
-                P("wdr5", "Nachrichten", "0M", minutes(5)),
-
-                P("wdr5", "Profit", "(18:05 & [MON | TUE | WED | THU | FRI | SAT])", minutes(25)),
-                P("wdr5", "Echo des Tages", "18:30", minutes(30)),
-                P("wdr5", "Europamagazin", "(20:05 & TUE)", minutes(55)),
-                P("wdr5", "Tischgespräch", "(20:05 & WED)", minutes(55)),
-                P("wdr5", "Funkhausgespräche", "(20:05 & THU)", minutes(55)),
-                P("wdr5", "Das philosophische Radio", "(20:05 & FRI)", minutes(55)),
-                P("wdr5", "U22", "(22:05 & [MON | TUE | WED | THU | FRI])", minutes(55)),
-                P("wdr5", "Berichte von heute", "(23:30 & [MON | TUE | WED | THU | FRI])", minutes(30)),
-                P("wdr5", "Satire Deluxe", "(11:05 & SAT)", minutes(55)),
-                P("wdr5", "Krimi am Samstag", "(17:05 & SAT)", minutes(55)),
-                P("wdr5", "MusikBonus", "(23:05 & SAT)", minutes(55)),
-                P("wdr5", "Dok5", "(11:05 & SUN)", minutes(55)),
-                P("wdr5", "Presseclub", "(12:00 & SUN)", minutes(60)),
-                P("wdr5", "Hörspiel", "(17:05 & SUN)", minutes(55)),
-                P("wdr5", "LeseLounge", "(20:05 & SUN)", minutes(55)),
-                P("wdr5", "LiederLounge", "(21:05 & SUN)", minutes(55)),
-                P("wdr5", "ZeitZeichen", "9:45", minutes(15)),
-            }
-        );
-    }
-
-
-
-    scheduler->run();
-
-    /*
-        http://www.wdr.de/wdrlive/media/wdr5.m3u
-        http://wdr-5.akacast.akamaistream.net/7/41/119439/v1/gnl.akacast.akamaistream.net/wdr-5
-
-        http://www.wdr.de/wdrlive/media/wdr2.m3u
-        http://wdr-mp3-m-wdr2-koeln.akacast.akamaistream.net/7/812/119456/v1/gnl.akacast.akamaistream.net/wdr-mp3-m-wdr2-koeln
-    */
-
-    /*
-    std::thread wdr5(download, "http://wdr-5.akacast.akamaistream.net/7/41/119439/v1/gnl.akacast.akamaistream.net/wdr-5", "/tmp/wdr5");
-    std::thread wdr2(download, "http://wdr-mp3-m-wdr2-koeln.akacast.akamaistream.net/7/812/119456/v1/gnl.akacast.akamaistream.net/wdr-mp3-m-wdr2-koeln", "/tmp/wdr2");
-
-    wdr5.join();
-    wdr2.join();
-    */
+    scheduler.run();
 }
