@@ -241,13 +241,17 @@ class Event {
 public:
     size_t programme;
     boost::posix_time::ptime time;
+    boost::posix_time::time_duration duration;
 
-    Event(size_t programme, const boost::posix_time::ptime& time):
+    Event(size_t programme, const boost::posix_time::ptime& time, const boost::posix_time::time_duration& duration):
         programme(programme),
-        time(time)
+        time(time),
+        duration(duration)
     {}
 
     friend bool operator<(const Event& ev1, const Event& ev2){
+        if(ev1.time == ev2.time)
+            return ev1.duration > ev2.duration;
         return ev1.time > ev2.time; //reverse order in priority_queue
         //pop() shall return the lowest element
     }
@@ -426,7 +430,7 @@ public:
             boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
             for(auto& programme: programmes){
                 auto when = (*programme.next)(now, false);
-                schedule.push(Event(programme.programme_id, when));
+                schedule.push(Event(programme.programme_id, when, programme.duration));
             }
         }
 
@@ -458,7 +462,7 @@ public:
             schedule.pop();
 
             auto when = (*programme.next)(event.time, true);
-            schedule.push(Event(event.programme, when));
+            schedule.push(Event(event.programme, when, event.duration));
         }
     }
 };
