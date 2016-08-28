@@ -152,15 +152,10 @@ private:
         Station* station = static_cast<Station*>(userdata);
         boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
 
-        if(station->last_progress_time.is_not_a_date_time() && dlnow > 0){
-            std::cout << "[OK ] " << std::left << std::setw(8) << station->name << " direct first packet received" << std::endl;
-
-            station->last_progress_time = now;
-            station->last_progress_bytes = dlnow;
-            return 0;
-        }
-
         if(dlnow != station->last_progress_bytes){
+            if(station->last_progress_bytes == 0){
+                std::cout << "[OK ] " << std::left << std::setw(8) << station->name << " direct first packet received" << std::endl;
+            }
             //std::cout << "dT: " << (now - station->last_progress_time) << std::endl;
 
             station->last_progress_time = now;
@@ -189,8 +184,10 @@ private:
         curl_easy_setopt(easyhandle, CURLOPT_XFERINFODATA, this);
 
         curl_easy_setopt(easyhandle, CURLOPT_NOPROGRESS, 0L);
+        last_progress_time = boost::posix_time::microsec_clock::local_time();
 
         std::cout << "[OK ] " << std::left << std::setw(8) << name << " performing direct request to " << url << std::endl;
+
 
         CURLcode success = curl_easy_perform(easyhandle);
 
