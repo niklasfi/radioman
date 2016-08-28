@@ -225,6 +225,8 @@ private:
             return;
         }
 
+        bool url_found = false;
+
         std::cout << "[OK ] " << name << " m3u fetched" << std::endl;
 
         size_t begin = 0; size_t end = m3u.find_first_of("\r\n", begin);
@@ -233,11 +235,16 @@ private:
             snip.erase(snip.find_last_not_of(" \n\r\t")+1);
 
             if(!snip.empty() && snip.front() != '#'){
+                url_found = true;
                 download_direct(snip);
             }
 
             begin = end;
             end = m3u.find_first_of("\r\n", begin);
+        }
+
+        if (!url_found){
+            std::cout << "[ERR] " << name << "no url found in m3u file" << std::endl;
         }
     }
 
