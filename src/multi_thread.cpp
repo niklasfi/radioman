@@ -153,14 +153,14 @@ private:
         boost::posix_time::ptime now(boost::posix_time::microsec_clock::local_time());
 
         if(station->last_progress_time.is_not_a_date_time() || dlnow != station->last_progress_bytes){
-            //std::cout << "dT: " << (now - station->last_progress_time) << "\n";
+            //std::cout << "dT: " << (now - station->last_progress_time) << std::endl;
 
             station->last_progress_time = now;
             station->last_progress_bytes = dlnow;
             return 0;
         }
         if(now - station->last_progress_time > boost::posix_time::seconds(station->timeout_direct)){
-            std::cout << "[ERR] " << station->name << " info timeout\n";
+            std::cout << "[ERR] " << station->name << " info timeout" << std::endl;
 
             station->last_progress_time = boost::posix_time::not_a_date_time;
             station->last_progress_bytes = 0;
@@ -182,10 +182,10 @@ private:
 
         curl_easy_setopt(easyhandle, CURLOPT_NOPROGRESS, 0L);
 
-        //std::cout << name << " direct download starts: " << url << "\n";
+        //std::cout << name << " direct download starts: " << url << std::endl;
         CURLcode success = curl_easy_perform(easyhandle);
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << "\n";
+            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << std::endl;
         }
 
         curl_easy_cleanup(easyhandle);
@@ -208,10 +208,10 @@ private:
 
         curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout_m3u);
 
-        //std::cout << name << " m3u download starts\n";
+        //std::cout << name << " m3u download starts" << std::endl;
         CURLcode success = curl_easy_perform(easyhandle);
         if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << "\n";
+            std::cout << "[ERR] " << name << " " << curl_easy_strerror(success) << std::endl;
         }
 
         curl_easy_cleanup(easyhandle);
@@ -296,7 +296,7 @@ public:
         }
         catch(const SettingNotFoundException &nfex)
         {
-            std::cerr << "No 'destinationPath' setting in configuration file.\n";
+            std::cerr << "No 'destinationPath' setting in configuration file." << std::endl;
             return(EXIT_FAILURE);
         }
 
@@ -309,7 +309,7 @@ public:
         }
         catch(const SettingNotFoundException &nfex)
         {
-            std::cerr << "No 'timeoutM3U' setting in configuration file.\n";
+            std::cerr << "No 'timeoutM3U' setting in configuration file." << std::endl;
             return(EXIT_FAILURE);
         }
 
@@ -319,7 +319,7 @@ public:
         }
         catch(const SettingNotFoundException &nfex)
         {
-            std::cerr << "No 'timeoutDirect' setting in configuration file.\n";
+            std::cerr << "No 'timeoutDirect' setting in configuration file." << std::endl;
             return(EXIT_FAILURE);
         }
 
@@ -340,7 +340,7 @@ public:
                 }
                 catch(const SettingNotFoundException &nfex)
                 {
-                    std::cerr << "Station without identifier found\n";
+                    std::cerr << "Station without identifier found" << std::endl;
                     return(EXIT_FAILURE);
                 }
 
@@ -350,7 +350,7 @@ public:
                 }
                 catch(const SettingNotFoundException &nfex)
                 {
-                    std::cerr << "Station " << station_identifier << " has no URL\n";
+                    std::cerr << "Station " << station_identifier << " has no URL" << std::endl;
                     return(EXIT_FAILURE);
                 }
                 stations.emplace_back(stations.size(), station_identifier, station_url, timeout_m3u, timeout_direct);
@@ -373,7 +373,7 @@ public:
                         }
                         catch(const SettingNotFoundException &nfex)
                         {
-                            std::cerr << "Programme without identifier found for station " << station_identifier << "\n";
+                            std::cerr << "Programme without identifier found for station " << station_identifier << std::endl;
                             return(EXIT_FAILURE);
                         }
 
@@ -383,7 +383,7 @@ public:
                         }
                         catch(const SettingNotFoundException &nfex)
                         {
-                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no schedule string\n";
+                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no schedule string" << std::endl;
                             return(EXIT_FAILURE);
                         }
 
@@ -393,7 +393,7 @@ public:
                         }
                         catch(const SettingNotFoundException &nfex)
                         {
-                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no duration\n";
+                            std::cerr << "Programme " << station_identifier << "-" << programme_identifier << " has no duration" << std::endl;
                             return(EXIT_FAILURE);
                         }
 
@@ -402,14 +402,14 @@ public:
                 }
                 catch(const SettingNotFoundException &nfex)
                 {
-                    std::cerr << "Station " << station_identifier << " has no programmes\n";
+                    std::cerr << "Station " << station_identifier << " has no programmes" << std::endl;
                     return(EXIT_FAILURE);
                 }
             }
         }
         catch(const SettingNotFoundException &nfex)
         {
-            std::cerr << "No 'schedule' setting in configuration file.\n";
+            std::cerr << "No 'schedule' setting in configuration file." << std::endl;
             return(EXIT_FAILURE);
         }
 
@@ -439,8 +439,8 @@ public:
             boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
             auto diff = (event.time - now);
             if(diff.total_microseconds() > 0){
-                //std::cout << "sleeping for " << diff << " for " << station.name << "-" << programme.name << "\n";
-                std::cout << event.time << " SLEEP " << station.name << "-" << programme.name << " for " << diff << "\n";
+                //std::cout << "sleeping for " << diff << " for " << station.name << "-" << programme.name << std::endl;
+                std::cout << event.time << " SLEEP " << station.name << "-" << programme.name << " for " << diff << std::endl;
                 std::this_thread::sleep_for(std::chrono::microseconds(diff.total_microseconds()));
             }
 
@@ -453,7 +453,7 @@ public:
             std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
             station.attach(Sink(event.time + programme.duration, std::move(ofs)));
 
-            std::cout << event.time << " START " << station.name << "-" << programme.name << " for " << programme.duration << "\n";
+            std::cout << event.time << " START " << station.name << "-" << programme.name << " for " << programme.duration << std::endl;
 
             schedule.pop();
 
@@ -465,14 +465,14 @@ public:
 
 int main(int argc, const char* argv[]){
     if(argc != 2){
-        std::cout << "usage: " << argv[0] << " configuration_path\n";
+        std::cout << "usage: " << argv[0] << " configuration_path" << std::endl;
         return -1;
     }
 
     Scheduler scheduler;
 
     if(scheduler.readConfig(argv[1]) != EXIT_SUCCESS){
-        std::cout << "parsing configuration file " << argv[1] << " failed.\nexiting\n";
+        std::cout << "parsing configuration file " << argv[1] << " failed.\nexiting" << std::endl;
         return -1;
     }
 
