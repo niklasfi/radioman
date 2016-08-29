@@ -112,7 +112,7 @@ public:
         original_url(original_url),
         timeout_m3u(timeout_m3u),
         timeout_direct(timeout_direct),
-        sinks_mutex(new std::mutex()),
+        sinks_mutex(std::make_unique<std::mutex>()),
         sinks(),
         last_progress_time(boost::posix_time::not_a_date_time),
         last_progress_bytes(0),
@@ -486,7 +486,7 @@ public:
             boost::filesystem::create_directories(prefixPath);
 
             std::string targetPath = prefixPath + "/" + station.name + "-" + programme.name + "-" + boost::posix_time::to_iso_extended_string(event.time) + ".mp3";
-            std::unique_ptr<std::ofstream> ofs(new std::ofstream(targetPath, std::ofstream::out | std::ofstream::app));
+            std::unique_ptr<std::ofstream> ofs(std::make_unique<std::ofstream>(targetPath, std::ofstream::out | std::ofstream::app));
             station.attach(Sink(event.time + programme.duration, std::move(ofs)));
 
             std::cout << event.time << " START " << station.name << "-" << programme.name << " for " << programme.duration << std::endl;
