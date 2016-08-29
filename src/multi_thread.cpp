@@ -226,18 +226,35 @@ private:
 
         std::cout << "[OK ] " << std::left << std::setw(8) << name << " m3u fetched" << std::endl;
 
-        size_t begin = 0; size_t end = m3u.find_first_of("\r\n", begin);
-        while(begin != std::string::npos){
-            std::string snip = m3u.substr(begin, end != std::string::npos ? end-begin : std::string::npos);
-            snip.erase(snip.find_last_not_of(" \n\r\t")+1);
 
-            if(!snip.empty() && snip.front() != '#'){
+        std::replace(m3u.begin(), m3u.end(), '\r', '\n');
+        //std::cout << "m3u:\n" << m3u << "\n" << std::endl;
+        size_t begin = 0; size_t end = m3u.find_first_of("\n", begin);
+        while(true){
+            //std::cout << "b: " << begin << ", e: " << end << ", eof: " << (end==std::string::npos) << std::endl;
+            std::string line = m3u.substr(begin, end == std::string::npos ? std::string::npos : end - begin);
+            //std::cout << "line: '" << line << "'" << std::endl;
+            const std::string whitespace = " \t";
+            size_t white_begin = line.find_first_not_of(whitespace);
+            if(white_begin == std::string::npos) white_begin = 0;
+            size_t white_end = line.find_last_not_of(whitespace);
+            if(white_end == std::string::npos) white_end = line.size();
+            else white_end += 1;
+            std::string url = line.substr(white_begin, white_end - white_begin);
+            //std::cout << "b: " << white_begin << ", e: " << white_end << std::endl;
+            //std::cout << "url: '" << url << "'" << std::endl;
+
+            if(!url.empty() && url.front() != '#'){
                 url_found = true;
-                download_direct(snip);
+                download_direct(url);
             }
 
-            begin = end;
-            end = m3u.find_first_of("\r\n", begin);
+            if(end == std::string::npos){
+                break;
+            }
+
+            begin = end + 1;
+            end = m3u.find_first_of("\n", begin);
         }
 
         if (!url_found){
