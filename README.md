@@ -30,7 +30,7 @@ If all prerequisites are installed properly, all you need to do is to run the fo
 
 ### Configuring
 
-Edit one of the `etc/config.*` files, or create one of your own. Ensure to set your preferred `destinationPath` in which all your recordings will be stored.
+Edit one of the `etc/config.*` files, or create one of your own. The sample config files are very verbose and contain a detailed explanation about creating your own recording shedule. Ensure to set your preferred `destinationPath` in which all your recordings will be stored.
 
 ### Runing
 

@@ -11,6 +11,26 @@ destinationPath = "/tmp/feedme-core-media/"
 #   - m3u url is a string containing the url of the m3u files
 #   - programmes is a list of programmes
 
+# schedule string syntax
+# ----------------------
+# Time
+# - **Seconds** `<number>S` is true iff the current time's seconds component is `<number>`. *Example:* The schedule string `0S` causes a recording to start at every full minute.
+# - **Minutes** `<number>M` is true iff the current time's minute component is `<number>`. *Example:* The schedule string `5M` causes a recording to start at five minutes past the hour mark every hour.
+# - **Hours** `<number>H` is true iff the current 24-hour time's hour component is `<number>`. *Example:* The schedule string ``
+# - **xx:yy Shorthand** `<hour>:<minute>` is equivalent to `(<hour>H & <minue>M)`. *Example:* The schedule string "15:30" causes a recording to start every day at 3:30 PM.
+#
+# Date
+# - **Day of the Week** To indicate the desired day of the week use the constants `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` and `SUN`. *Example*: The schedule string `SAT` causes the recording to start on Saturdays at midnight.
+# - **Day of the Month** `<number>d` is true iff the current date's day of the month is `<number>`. *Example* The schedule string `3d` causes a recording to start every month on the third day of the month at midnight.
+# - **Month** To indicat the desired month use the `JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV` and `DEC`. *Example*: The schedule string `DEC` causes the recording to start on the first of December at midnight every year.
+#
+# Logical operations:
+# - **or**: `[expression1 | expression2 | ...]` use brackets to indicate either expression1 or expression2 or any of the other expressions have to hold in order for the recording to start. *Example*: `[SAT | SUN]` starts a recording on Saturdays and Sundays at midnight.
+# - **and**: `(expression1 & expression2 & ...)` use round brackets to indicate all of the expressions have to be fulfilled in order for the recording to start. *Example*: `(4:30 & WED)` starts a recording every Wednesday at 4:30 AM.
+# - remark: due to a shortcoming in my ability to use boost_parse it is currently not allows to have whitespace between opening brackets and the first expression and the last expression and the closing brackets. If you know how to fix this, please do so!
+#
+# For more examples of schedule strings have a look at src/next_test.cpp and execute its binary bin/next_test.
+
 schedule: (
     ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
       ("1minute", "0S", 2),
