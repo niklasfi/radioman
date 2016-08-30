@@ -65,7 +65,7 @@ Running feedme-core is pretty simple. Just pass your config file as a parameter 
 
 ### Registering as a systemd service
 
-There is a sample systemd service file in the `etc` directory. You can adapt it to your needs by changing the `User` and `Group` as well as the path to the binary and config in the `ExecStart` setting. Once you are don copy it to `etc/systemd/system/feedme-core.service` or create a symlink pointing to your local service file in this location.
+There is a sample systemd service file in the `etc` directory. You can adapt it to your needs by changing the `User` and `Group` as well as the path to the binary and config in the `ExecStart` setting. Once you are done, copy it to `etc/systemd/system/feedme-core.service` or create a symlink pointing to your local service file in this location. Finally you need to tell systemd to reload its configuration files by executing `sudo systemctl daemon-reload`.
 
 To start the feedme-core service, call
 
