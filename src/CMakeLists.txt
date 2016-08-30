@@ -19,5 +19,5 @@ add_library(next next.cpp)
 add_executable(next_test next_test.cpp)
 target_link_libraries(next_test next)
 
-add_executable(multi_thread multi_thread.cpp)
-target_link_libraries(multi_thread next curl pthread config++ ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+add_executable(feedme-core feedme-core.cpp)
+target_link_libraries(feedme-core next curl pthread config++ ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
