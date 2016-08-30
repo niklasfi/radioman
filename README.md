@@ -71,6 +71,10 @@ To start the feedme-core service, call
 
     sudo systemctl start feedme-core
 
+You can check the status of the feedme-core service with
+
+    sudo systemctl status feedme core
+
 To ensure the feedme-core service is run at startup you need to enable it. To do so:
 
     sudo systemctl enable feedme-core
