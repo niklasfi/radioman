@@ -14,22 +14,10 @@ set(CMAKE_CXX_FLAGS "-isystem ${Boost_INCLUDE_DIRS} ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "-ggdb -O0 ${CMAKE_CXX_FLAGS}")
 # set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")
 
-add_executable(core core.cpp)
-
-add_executable(parse parse.cpp)
-
-add_executable(parse2 parse2.cpp)
-
 add_library(next next.cpp)
 
 add_executable(next_test next_test.cpp)
 target_link_libraries(next_test next)
-
-add_executable(mycurl curl.cpp)
-target_link_libraries(mycurl curl ${Boost_SYSTEM_LIBRARY})
-
-add_executable(curl_asio curl_asio.cpp)
-target_link_libraries(curl_asio curl ${Boost_SYSTEM_LIBRARY})
 
 add_executable(multi_thread multi_thread.cpp)
 target_link_libraries(multi_thread next curl pthread config++ ${Boost_DATE_TIME_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
