@@ -276,14 +276,25 @@ namespace NextFunctor {
     }
 
     ptime AllOf::operator()(const ptime& from, bool force_carry){
-        ptime t(from);
+        ptime t;
+
+        if(force_carry){
+            t = boost::date_time::pos_infin;
+            for(auto& f: this->conditions){
+                //std::cout << t << "\n";
+                t = std::min(t, (*f)(from, true));
+            }
+            //std::cout << "final: " << t << "\n";
+        }
+        else{
+            t = from;
+        }
 
         ptime begin;
         while (t != begin){
             begin = t;
             for(auto& f: this->conditions){
-                t = (*f)(t, force_carry);
-                force_carry = false;
+                t = (*f)(t, false);
             }
         }
         return t;

@@ -74,7 +74,7 @@ int main(){
         ptime d2rr((*f)(d2, true));
 
         std::cout << "d2: " << d2 << "\td2rr: " << d2rr << "\n";
-        assert(d2rr == ptime(date(2017, moy::Jan, 11), seconds(13)));
+        assert(d2rr == ptime(date(2017, moy::Jan, 4), minutes(1) + seconds(13)));
 
         ptime d3(date(2016, moy::Feb, 27), hours(9) + minutes(37) + seconds(1));
         ptime d3r((*f)(d3, false));
@@ -112,6 +112,57 @@ int main(){
 
         std::cout << "d2: " << d2 << "\td2rr: " << d2rr << "\n";
         assert(d2rr == ptime(date(2016, moy::Aug, 8), hours(16) + minutes(30)));
+
+        std::cout << "OK\n\n";
+    }
+
+    {
+        std::cout << "=== TEST f4 ===\n\n";
+
+        f_ptr f(Base::parse("(WED & 14H)"));
+        std::cout << *f << "\n";
+
+        ptime d1(date(2016, moy::Aug, 31), hours(14) + minutes(5));
+        ptime d1r((*f)(d1, true));
+
+        std::cout << "d1: " << d1 << "\td1r:  " << d1r << "\n";
+        assert(d1r == ptime(date(2016, moy::Sep, 7), hours(14)));
+
+        std::cout << "OK\n\n";
+    }
+
+    {
+        std::cout << "=== TEST f5 ===\n\n";
+
+        f_ptr f(Base::parse("(WED & 14H & 5M)"));
+        std::cout << *f << "\n";
+
+        ptime d1(date(2016, moy::Aug, 31), hours(4) + minutes(5));
+        ptime d1r((*f)(d1, true));
+
+        std::cout << "d1: " << d1 << "\td1r:  " << d1r << "\n";
+        assert(d1r == ptime(date(2016, moy::Aug, 31), hours(14) + minutes(5)));
+
+        std::cout << "OK\n\n";
+    }
+
+    {
+        std::cout << "=== TEST f6 ===\n\n";
+
+        f_ptr f(Base::parse("(WED & [13H|4H] & 5M)"));
+        std::cout << *f << "\n";
+
+        ptime d1(date(2016, moy::Aug, 31), hours(4) + minutes(5));
+        ptime d1r((*f)(d1, true));
+
+        std::cout << "d1: " << d1 << "\td1r:  " << d1r << "\n";
+        assert(d1r == ptime(date(2016, moy::Aug, 31), hours(13)+ minutes(5)));
+
+        ptime d2(date(2016, moy::Aug, 31), hours(4));
+        ptime d2r((*f)(d2, true));
+
+        std::cout << "d2: " << d2 << "\td2r:  " << d2r << "\n";
+        assert(d2r == ptime(date(2016, moy::Aug, 31), hours(4)+ minutes(5)));
 
         std::cout << "OK\n\n";
     }
