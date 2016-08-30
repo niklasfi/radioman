@@ -27,7 +27,7 @@ destinationPath = "/tmp/feedme-core-media/"
 # Logical operations:
 # - **or**: `[expression1 | expression2 | ...]` use brackets to indicate either expression1 or expression2 or any of the other expressions have to hold in order for the recording to start. *Example*: `[SAT | SUN]` starts a recording on Saturdays and Sundays at midnight.
 # - **and**: `(expression1 & expression2 & ...)` use round brackets to indicate all of the expressions have to be fulfilled in order for the recording to start. *Example*: `(4:30 & WED)` starts a recording every Wednesday at 4:30 AM.
-# - remark: due to a shortcoming in my ability to use boost_parse it is currently not allows to have whitespace between opening brackets and the first expression and the last expression and the closing brackets. If you know how to fix this, please do so!
+# - remark: due to a shortcoming in my ability to use boost_parse it is currently not allowed to have whitespace between opening brackets and the first expression and the last expression and the closing brackets. If you know how to fix this, please do so!
 #
 # For more examples of schedule strings have a look at src/next_test.cpp and execute its binary bin/next_test.
 
