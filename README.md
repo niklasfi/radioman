@@ -50,6 +50,10 @@ To ensure the feedme-core service is run at startup you need to enable it. To do
 
     sudo systemctl enable feedme-core
 
+If you kept the `StandardOutput` setting in your service file, you can follow feedme-core's logs using
+
+    sudo journalctl -u feedme-core -f -o cat
+
 ## Isn't this totally overengineered?
 
 Of course it is! It all started out with a simple recording script which was called via cron jobs at regular intervals. For reference, this is it:
