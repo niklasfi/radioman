@@ -4,6 +4,12 @@
 
 Are you tired of your favourite radio shows still not providing a podcast service? Is your favourite music only played at nighttime? feedme-core allows you to record just about any radio webstream that syndicates mp3 streams via m3u playlists (which should be just about every station) according to a predefined schedule.
 
+### Features
+
+- Schedule string syntax allows for the most complicated recording schedules.
+- Recovers from connection losses gracefully without interupting the recording.
+- Easy systemd service integration.
+
 ## How do I get it?
 
 ### Clone the repository
