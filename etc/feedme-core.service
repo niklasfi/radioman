@@ -6,7 +6,7 @@ After=syslog.target network.target
 Type=simple
 User=niklas
 Group=niklas
-ExecStart=/var/www/feedme-core/bin/feedme-core /var/www/feedme-core/src/config.production
+ExecStart=/var/www/feedme-core/bin/feedme-core /var/www/feedme-core/etc/config.production
 StandardOutput=journal
 Restart=always
 
