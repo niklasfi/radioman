@@ -40,6 +40,9 @@ schedule: (
       ("Hintergrund", "18:40", 20),
       ("Mitternachtskrimi", "(00:05 & SAT)", 55)
     )),
+    ("mdr1", "http://avw.mdr.de/livestreams/mdr1_radio_sachsen_live_128.m3u", (
+      ("Nachrichten", "0M", 5)
+    )),
     ("ndr2", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u", (
       ("Nachrichten", "0M", 5)
     )),
