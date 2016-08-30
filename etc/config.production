@@ -78,7 +78,7 @@ schedule: (
       ("Nachrichten", "0M", 5),
       ("MonTalk", "(19:05 & MON)", 115),
       ("Zugabe", "(22:30 & FRI)", 60),
-      ("In Concert", "(23:05 & FRI)", 55)
+      ("In Concert", "(23:05 & SUN)", 55)
     )),
     ("wdr3", "http://www.wdr.de/wdrlive/media/wdr3.m3u", (
       ("Nachrichten", "0M", 5),
