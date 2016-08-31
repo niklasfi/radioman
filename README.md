@@ -122,4 +122,5 @@ It turned out, that, while this is a good way to get started, it did not handle 
 In the end, the C++ solution is elegant in its own way.
 - It utilizes worker threads which ensure that their assigned stream is always available.
 - The use of boost_parse allows for a very concise way to formulate recording shedules as time constraints.
+- It handles pls playslists and direct downloads, which the above approach does not.
 - It just works.
