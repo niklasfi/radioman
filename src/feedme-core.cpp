@@ -50,10 +50,13 @@ public:
 
 class Station {
 public:
+    enum class Strategy { direct, m3u };
+
 //const and therefore freely accessible
     const size_t id;
     const std::string name;
     const std::string original_url;
+    const Strategy strategy;
     const long timeout_m3u;
     const long timeout_direct;
 private:
@@ -67,12 +70,13 @@ private:
     std::thread thread;
 
 public:
-    void spawn_direct(const std::string& url){
-        this->thread = std::thread(&Station::download_direct_loop, this, url); //.detach();
-    }
-
-    void spawn_m3u(const std::string& url){
-        this->thread = std::thread(&Station::download_m3u_loop, this, url); //.detach();
+    void spawn(){
+        if(strategy == Strategy::direct){
+            this->thread = std::thread(&Station::download_direct_loop, this, original_url); //.detach();
+        }
+        else if (strategy == Strategy::m3u){
+            this->thread = std::thread(&Station::download_m3u_loop, this, original_url); //.detach();
+        }
     }
 
     void attach(Sink&& sink){
@@ -80,10 +84,11 @@ public:
         std::lock_guard<std::mutex> lock(*sinks_mutex);
         sinks.emplace_back(std::move(sink));
     }
-    Station(size_t id, const std::string& name, const std::string& original_url, long timeout_m3u, long timeout_direct):
+    Station(size_t id, const std::string& name, const std::string& original_url, Strategy strategy, long timeout_m3u, long timeout_direct):
         id(id),
         name(name),
         original_url(original_url),
+        strategy(strategy),
         timeout_m3u(timeout_m3u),
         timeout_direct(timeout_direct),
         sinks_mutex(std::make_unique<std::mutex>()),
@@ -342,6 +347,7 @@ public:
                 const Setting& station_setting = schedule_setting[i];
 
                 std::string station_identifier;
+                Station::Strategy station_strategy;
                 std::string station_url;
 
                 try
@@ -356,18 +362,39 @@ public:
 
                 try
                 {
-                    station_url = static_cast<const char*>(station_setting[1]);
+                    std::string strategy_string = static_cast<const char*>(station_setting[1]);
+
+                    if(strategy_string == "direct"){
+                        station_strategy = Station::Strategy::direct;
+                    }
+                    else if(strategy_string == "m3u"){
+                        station_strategy = Station::Strategy::m3u;
+                    }
+                    else{
+                        std::cerr << "Station " << station_identifier << "'s strategy is invald. It must either be 'direct' or 'm3u'." << std::endl;
+                        return(EXIT_FAILURE);
+                    }
+                }
+                catch(const SettingNotFoundException &nfex)
+                {
+                    std::cerr << "Station " << station_identifier << " has no strategy" << std::endl;
+                    return(EXIT_FAILURE);
+                }
+
+                try
+                {
+                    station_url = static_cast<const char*>(station_setting[2]);
                 }
                 catch(const SettingNotFoundException &nfex)
                 {
                     std::cerr << "Station " << station_identifier << " has no URL" << std::endl;
                     return(EXIT_FAILURE);
                 }
-                stations.emplace_back(stations.size(), station_identifier, station_url, timeout_m3u, timeout_direct);
+                stations.emplace_back(stations.size(), station_identifier, station_url, station_strategy, timeout_m3u, timeout_direct);
 
                 try
                 {
-                    const Setting& programmes_setting = station_setting[2];
+                    const Setting& programmes_setting = station_setting[3];
 
                     int programme_count = programmes_setting.getLength();
                     for(int j = 0; j < programme_count; ++j){
@@ -429,7 +456,7 @@ public:
     void run(){
         //start the station curl threads
         for(auto& station: stations){
-            station.spawn_m3u(station.original_url);
+            station.spawn();
         }
 
         {

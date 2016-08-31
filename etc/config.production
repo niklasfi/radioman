@@ -6,9 +6,10 @@ destinationPath = "/var/www/feedme-core/media/"
 #   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the station identifier to determine the output paths for recordings
 #   - schedule is a parsable schedule string
 #   - duration is an integer indicating the length of the recording in minutes
-# - a station is a three-tuple: ( identifier, m3u url, programmes)
+# - a station is a three-tuple: ( identifier, strategy, url, programmes)
 #   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the programme identifier to determine the output paths for recordings
-#   - m3u url is a string containing the url of the m3u files
+#   - strategy is either "direct" or "m3u" indicating either a direct download (the provided url points directly to an mp3 stream) or an m3u playlist.
+#   - url is a string pointing to the stream or m3u playlist.
 #   - programmes is a list of programmes
 
 # schedule string syntax
@@ -32,7 +33,7 @@ destinationPath = "/var/www/feedme-core/media/"
 # For more examples of schedule strings have a look at src/next_test.cpp and execute its binary bin/next_test.
 
 schedule: (
-    ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
+    ("1live", "m3u", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
       #("1minute", "0S", 2),
       ("Nachrichten", "0M", 5),
       ("Krimi-Shortstory", "(23:05 & THU)", 55),
@@ -40,14 +41,14 @@ schedule: (
       ("DJ_Session", "(00:00 & SUN)", 180),
       ("Kassettendeck", "(23:05 & MON)", 55)
     )),
-    ("br2", "http://streams.br.de/bayern2_2.m3u", (
+    ("br2", "m3u", "http://streams.br.de/bayern2_2.m3u", (
       ("Nachrichten", "0M", 5),
       ("radioSpitzen", "(14:05 & FRI)", 55)
     )),
-    ("br3", "http://streams.br.de/bayern3_2.m3u", (
+    ("br3", "m3u", "http://streams.br.de/bayern3_2.m3u", (
       ("Nachrichten", "0M", 5)
     )),
-    ("dlf", "http://www.dradio.de/streaming/dlf.m3u", (
+    ("dlf", "m3u", "http://www.dradio.de/streaming/dlf.m3u", (
       ("Nachrichten", "0M", 10),
       ("Andruck", "(19:15 & MON)", 45),
       ("Aus Kultur- und Sozialwissenschaften", "(20:10 & THU)", 50),
@@ -60,13 +61,13 @@ schedule: (
       ("Hintergrund", "18:40", 20),
       ("Mitternachtskrimi", "(00:05 & SAT)", 55)
     )),
-    ("mdr1", "http://avw.mdr.de/livestreams/mdr1_radio_sachsen_live_128.m3u", (
+    ("mdr1", "m3u", "http://avw.mdr.de/livestreams/mdr1_radio_sachsen_live_128.m3u", (
       ("Nachrichten", "0M", 5)
     )),
-    ("ndr2", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u", (
+    ("ndr2", "m3u", "http://www.ndr.de/resources/metadaten/audio/m3u/ndr2.m3u", (
       ("Nachrichten", "0M", 5)
     )),
-    ("ndrinfo", "http://www.ndr.de/resources/metadaten/audio/m3u/ndrinfo.m3u", (
+    ("ndrinfo", "m3u", "http://www.ndr.de/resources/metadaten/audio/m3u/ndrinfo.m3u", (
       ("Nachrichten", "0M", 5),
       ("Intensiv-Station", "(21:05 & MON)", 55),
       ("Das Kriminalhörspiel", "(21:05 & SAT)", 55),
@@ -74,20 +75,20 @@ schedule: (
       ("Die Reportage", "(17:30 & SUN)", 30),
       ("Das Hörspiel", "(21:05 & SUN)", 85)
     )),
-    ("wdr2", "http://www.wdr.de/wdrlive/media/wdr2.m3u", (
+    ("wdr2", "m3u", "http://www.wdr.de/wdrlive/media/wdr2.m3u", (
       ("Nachrichten", "0M", 5),
       ("MonTalk", "(19:05 & MON)", 115),
       ("Zugabe", "(22:30 & FRI)", 60),
       ("In Concert", "(23:05 & SUN)", 55)
     )),
-    ("wdr3", "http://www.wdr.de/wdrlive/media/wdr3.m3u", (
+    ("wdr3", "m3u", "http://www.wdr.de/wdrlive/media/wdr3.m3u", (
       ("Nachrichten", "0M", 5),
       ("Hörspiel", "(19:04 & [MON | TUE | WED | THU | FRI])", 56),
       ("ARD Radiofestival. Konzert", "(20:04 & [MON | TUE | WED | THU | FRI | SUN])", 146),
       ("ARD Radiofestival. Kabarett", "(22:30 & SUN)", 60),
       ("ARD Radiofestival. Lesung", "(22:30 & [MON | TUE | WED | THU | FRI])", 30)
     )),
-    ("wdr5", "http://www.wdr.de/wdrlive/media/wdr5.m3u", (
+    ("wdr5", "m3u", "http://www.wdr.de/wdrlive/media/wdr5.m3u", (
       ("Nachrichten", "0M", 5),
       ("Profit", "(18:05 & [MON | TUE | WED | THU | FRI | SAT])", 25),
       ("Echo des Tages", "18:30", 30),

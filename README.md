@@ -15,19 +15,22 @@ Are you tired of your favourite radio shows still not providing a podcast servic
 Let's look at a sample schedule:
 
     schedule: (
-        ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
+        ("1live", "m3u", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
           ("hourly", "0M", 60),
           ("News", "0M", 5)
         )),
-        ("wdr2", "http://www.wdr.de/wdrlive/media/wdr2.m3u", (
+        ("wdr2", "m3u", "http://www.wdr.de/wdrlive/media/wdr2.m3u", (
           ("News", "0M", 5),
           ("MonTalk", "(19:05 & MON)", 115),
           ("Zugabe", "(22:30 & FRI)", 60),
           ("In Concert", "(23:05 & SUN)", 55)
+        )),
+        ("bbc-r1", "direct", "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1_mf_p", (
+          ("News", "0M", 5)
         ))
     )
 
-A schedule consists of a list of stations, which in turn consist of an identifier ("1live"), an URL ("http://www.wdr.de/wdrlive/media/einslive.m3u") and a list if programmes to be recorded on this station. A programme consists of an identifier, a schedule string and a duration in minutes. The schedule string encodes the conditions which have to be met to start a recording. For example *wdr2-In Concert* airs every Sunday at 11:05 PM. This can simply be stated as "(23:05 & SUN)". For a more in depth look at schedule strings and their syntax, look at the configuration files located in the `etc` directory.
+A schedule consists of a list of stations, which in turn consist of an identifier ("1live"), a strategy (either "direct" for direct downloads of mp3 streams or "m3u" for playlists), an URL ("http://www.wdr.de/wdrlive/media/einslive.m3u") and a list if programmes to be recorded on this station. A programme consists of an identifier, a schedule string and a duration in minutes. The schedule string encodes the conditions which have to be met to start a recording. For example *wdr2-In Concert* airs every Sunday at 11:05 PM. This can simply be stated as "(23:05 & SUN)". For a more in depth look at schedule strings and their syntax, look at the configuration files located in the `etc` directory.
 
 ## How do I get it?
 

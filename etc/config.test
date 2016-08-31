@@ -6,9 +6,10 @@ destinationPath = "/tmp/feedme-core-media/"
 #   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the station identifier to determine the output paths for recordings
 #   - schedule is a parsable schedule string
 #   - duration is an integer indicating the length of the recording in minutes
-# - a station is a three-tuple: ( identifier, m3u url, programmes)
+# - a station is a three-tuple: ( identifier, strategy, url, programmes)
 #   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the programme identifier to determine the output paths for recordings
-#   - m3u url is a string containing the url of the m3u files
+#   - strategy is either "direct" or "m3u" indicating either a direct download (the provided url points directly to an mp3 stream) or an m3u playlist.
+#   - url is a string pointing to the stream or m3u playlist.
 #   - programmes is a list of programmes
 
 # schedule string syntax
@@ -32,7 +33,7 @@ destinationPath = "/tmp/feedme-core-media/"
 # For more examples of schedule strings have a look at src/next_test.cpp and execute its binary bin/next_test.
 
 schedule: (
-    ("1live", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
+    ("1live", "m3u", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
       ("1minute", "0S", 2),
       ("Nachrichten", "0M", 5)
     ))
