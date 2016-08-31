@@ -25,12 +25,12 @@ Let's look at a sample schedule:
           ("Zugabe", "(22:30 & FRI)", 60),
           ("In Concert", "(23:05 & SUN)", 55)
         )),
-        ("bbc-r1", "direct", "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1_mf_p", (
+        ("bbc-r1", "pls", "http://www.bbc.co.uk/worldservice/meta/live/mp3/eneuk.pls", (
           ("News", "0M", 5)
         ))
     )
 
-A schedule consists of a list of stations, which in turn consist of an identifier ("1live"), a strategy (either "direct" for direct downloads of mp3 streams or "m3u" for playlists), an URL ("http://www.wdr.de/wdrlive/media/einslive.m3u") and a list if programmes to be recorded on this station. A programme consists of an identifier, a schedule string and a duration in minutes. The schedule string encodes the conditions which have to be met to start a recording. For example *wdr2-In Concert* airs every Sunday at 11:05 PM. This can simply be stated as "(23:05 & SUN)". For a more in depth look at schedule strings and their syntax, look at the configuration files located in the `etc` directory.
+A schedule consists of a list of stations, which in turn consist of an identifier ("1live"), a strategy (either "direct" for direct downloads of mp3 streams or "m3u" or "pls" for playlists), an URL ("http://www.wdr.de/wdrlive/media/einslive.m3u") and a list if programmes to be recorded on this station. A programme consists of an identifier, a schedule string and a duration in minutes. The schedule string encodes the conditions which have to be met to start a recording. For example *wdr2-In Concert* airs every Sunday at 11:05 PM. This can simply be stated as "(23:05 & SUN)". For a more in depth look at schedule strings and their syntax, look at the configuration files located in the `etc` directory.
 
 ### Where can I get stream urls from?
 
