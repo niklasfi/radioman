@@ -14,21 +14,6 @@
 
 #include <boost/filesystem.hpp>
 
-class ConfigurationProgramme {
-public:
-    std::string station;
-    std::string name;
-    std::shared_ptr<NextFunctor::Base> next;
-    boost::posix_time::time_duration duration;
-
-    ConfigurationProgramme(const std::string& station, const std::string& name, const std::string& next, const boost::posix_time::time_duration& duration):
-        station(station),
-        name(name),
-        next(NextFunctor::Base::parse(next)),
-        duration(duration)
-    {}
-};
-
 class Programme {
 public:
     const size_t station_id;
@@ -43,17 +28,6 @@ public:
         name(name),
         next(next),
         duration(duration)
-    {}
-};
-
-class ConfigurationStation {
-public:
-    std::string name;
-    std::string url;
-
-    ConfigurationStation(const std::string& name, const std::string& url):
-        name(name),
-        url(url)
     {}
 };
 
