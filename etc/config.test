@@ -44,7 +44,7 @@ schedule: (
 
 
 # curl timeouts
-# timeoutM3U: long which determines the maximum total length of an m3u request in seconds
-timeoutM3U = 5L
 # tiemoutDirect: long which determines the maximum acceptable time without any new data being received in seconds
 timeoutDirect = 5L
+# timeoutPlaylist: long which determines the maximum total length of playlist download requests in seconds
+timeoutPlaylist = 5L

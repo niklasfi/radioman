@@ -57,8 +57,8 @@ public:
     const std::string name;
     const std::string original_url;
     const Strategy strategy;
-    const long timeout_m3u;
     const long timeout_direct;
+    const long timeout_playlist;
 private:
 //owned and (predominantly) managed by the cURL thread
 //make sure to acquire the mutex before accessing `sinks`
@@ -75,7 +75,7 @@ public:
             this->thread = std::thread(&Station::download_direct_loop, this, original_url); //.detach();
         }
         else if (strategy == Strategy::m3u){
-            this->thread = std::thread(&Station::download_m3u_loop, this, original_url); //.detach();
+            this->thread = std::thread(&Station::download_playlist_loop, this, original_url); //.detach();
         }
     }
 
@@ -84,13 +84,13 @@ public:
         std::lock_guard<std::mutex> lock(*sinks_mutex);
         sinks.emplace_back(std::move(sink));
     }
-    Station(size_t id, const std::string& name, const std::string& original_url, Strategy strategy, long timeout_m3u, long timeout_direct):
+    Station(size_t id, const std::string& name, const std::string& original_url, Strategy strategy, long timeout_direct, long timeout_playlist):
         id(id),
         name(name),
         original_url(original_url),
         strategy(strategy),
-        timeout_m3u(timeout_m3u),
         timeout_direct(timeout_direct),
+        timeout_playlist(timeout_playlist),
         sinks_mutex(std::make_unique<std::mutex>()),
         sinks(),
         last_progress_time(boost::posix_time::not_a_date_time),
@@ -115,7 +115,7 @@ private:
         return size * nmemb;
     }
 
-    static size_t write_callback_m3u(char* ptr, size_t size, size_t nmemb, void *userdata){
+    static size_t write_callback_playlist(char* ptr, size_t size, size_t nmemb, void *userdata){
         std::string* m3u = static_cast<std::string*>(userdata);
 
         m3u->append(ptr, size * nmemb);
@@ -181,37 +181,14 @@ private:
         }
     }
 
-    void download_m3u(const std::string& url){
-        CURL* easyhandle = curl_easy_init();
-        std::string m3u;
+    std::vector<std::string> parse_m3u(const std::string& input){
+        std::vector<std::string> result;
 
-        curl_easy_setopt(easyhandle, CURLOPT_URL, url.c_str());
-
-        curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_callback_m3u);
-        curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &m3u);
-
-        curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout_m3u);
-
-        //std::cout << name << " m3u download starts" << std::endl;
-        CURLcode success = curl_easy_perform(easyhandle);
-        curl_easy_cleanup(easyhandle);
-
-        if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
-            std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
-            return;
-        }
-
-        bool url_found = false;
-
-        std::cout << "[OK ] " << std::left << std::setw(8) << name << " m3u fetched" << std::endl;
-
-
-        std::replace(m3u.begin(), m3u.end(), '\r', '\n');
         //std::cout << "m3u:\n" << m3u << "\n" << std::endl;
-        size_t begin = 0; size_t end = m3u.find_first_of("\n", begin);
+        size_t begin = 0; size_t end = input.find_first_of("\n", begin);
         while(true){
             //std::cout << "b: " << begin << ", e: " << end << ", eof: " << (end==std::string::npos) << std::endl;
-            std::string line = m3u.substr(begin, end == std::string::npos ? std::string::npos : end - begin);
+            std::string line = input.substr(begin, end == std::string::npos ? std::string::npos : end - begin);
             //std::cout << "line: '" << line << "'" << std::endl;
             const std::string whitespace = " \t";
             size_t white_begin = line.find_first_not_of(whitespace);
@@ -224,8 +201,8 @@ private:
             //std::cout << "url: '" << url << "'" << std::endl;
 
             if(!url.empty() && url.front() != '#'){
-                url_found = true;
-                download_direct(url);
+                //download_direct(url);
+                result.push_back(url);
             }
 
             if(end == std::string::npos){
@@ -233,17 +210,54 @@ private:
             }
 
             begin = end + 1;
-            end = m3u.find_first_of("\n", begin);
+            end = input.find_first_of("\n", begin);
         }
 
-        if (!url_found){
-            std::cout << "[ERR] " << std::left << std::setw(8) << name << "no url found in m3u file" << std::endl;
+        return result;
+    }
+
+    void download_playlist(const std::string& url){
+        CURL* easyhandle = curl_easy_init();
+        std::string playlist;
+
+        curl_easy_setopt(easyhandle, CURLOPT_URL, url.c_str());
+
+        curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_callback_playlist);
+        curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &playlist);
+
+        curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, timeout_playlist);
+
+        //std::cout << name << " playlist download starts" << std::endl;
+        CURLcode success = curl_easy_perform(easyhandle);
+        curl_easy_cleanup(easyhandle);
+
+        if (success != CURLE_OK && success != CURLE_WRITE_ERROR){
+            std::cout << "[ERR] " << std::left << std::setw(8) << name << " " << curl_easy_strerror(success) << std::endl;
+            return;
+        }
+
+        std::cout << "[OK ] " << std::left << std::setw(8) << name << " playlist fetched" << std::endl;
+
+        std::replace(playlist.begin(), playlist.end(), '\r', '\n');
+        std::vector<std::string> urls;
+
+        if(strategy == Strategy::m3u){
+            urls = parse_m3u(playlist);
+        }
+
+        if (urls.empty()){
+            std::cout << "[ERR] " << std::left << std::setw(8) << name << "no url found in playlist file" << std::endl;
+        }
+        else{
+            for(auto& url: urls){
+                download_direct(url);
+            }
         }
     }
 
-    void download_m3u_loop(const std::string& url){
+    void download_playlist_loop(const std::string& url){
         while(true){
-            download_m3u(url);
+            download_playlist(url);
         }
     }
 };
@@ -315,18 +329,8 @@ public:
             return(EXIT_FAILURE);
         }
 
-        long timeout_m3u;
         long timeout_direct;
-
-        try
-        {
-            timeout_m3u = cfg.lookup("timeoutM3U");
-        }
-        catch(const SettingNotFoundException &nfex)
-        {
-            std::cerr << "No 'timeoutM3U' setting in configuration file." << std::endl;
-            return(EXIT_FAILURE);
-        }
+        long timeout_playlist;
 
         try
         {
@@ -337,6 +341,16 @@ public:
             std::cerr << "No 'timeoutDirect' setting in configuration file." << std::endl;
             return(EXIT_FAILURE);
         }
+        try
+        {
+            timeout_playlist = cfg.lookup("timeoutPlaylist");
+        }
+        catch(const SettingNotFoundException &nfex)
+        {
+            std::cerr << "No 'timeoutPlaylist' setting in configuration file." << std::endl;
+            return(EXIT_FAILURE);
+        }
+
 
         try
         {
@@ -390,7 +404,7 @@ public:
                     std::cerr << "Station " << station_identifier << " has no URL" << std::endl;
                     return(EXIT_FAILURE);
                 }
-                stations.emplace_back(stations.size(), station_identifier, station_url, station_strategy, timeout_m3u, timeout_direct);
+                stations.emplace_back(stations.size(), station_identifier, station_url, station_strategy, timeout_direct, timeout_playlist);
 
                 try
                 {
