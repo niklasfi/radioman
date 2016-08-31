@@ -2,7 +2,7 @@
 
 ## What does it do?
 
-Are you tired of your favourite radio shows still not providing a podcast service? Is your favourite music only played at nighttime? feedme-core allows you to record just about any radio webstream that syndicates mp3 streams via m3u playlists (which should be just about every station) according to a predefined schedule.
+Are you tired of your favourite radio shows still not providing a podcast service? Is your favourite music only played at nighttime? feedme-core allows you to record just about any radio webstream that syndicates mp3 streams either directly or via m3u or pls playlists (which should be just about every station) according to a predefined schedule.
 
 ### Features
 

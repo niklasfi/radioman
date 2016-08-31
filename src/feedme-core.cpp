@@ -50,7 +50,7 @@ public:
 
 class Station {
 public:
-    enum class Strategy { direct, m3u };
+    enum class Strategy { direct, m3u, pls };
 
 //const and therefore freely accessible
     const size_t id;
@@ -74,7 +74,7 @@ public:
         if(strategy == Strategy::direct){
             this->thread = std::thread(&Station::download_direct_loop, this, original_url); //.detach();
         }
-        else if (strategy == Strategy::m3u){
+        else {
             this->thread = std::thread(&Station::download_playlist_loop, this, original_url); //.detach();
         }
     }
@@ -201,8 +201,45 @@ private:
             //std::cout << "url: '" << url << "'" << std::endl;
 
             if(!url.empty() && url.front() != '#'){
-                //download_direct(url);
                 result.push_back(url);
+            }
+
+            if(end == std::string::npos){
+                break;
+            }
+
+            begin = end + 1;
+            end = input.find_first_of("\n", begin);
+        }
+
+        return result;
+    }
+
+    std::vector<std::string> parse_pls(const std::string& input){
+        std::vector<std::string> result;
+
+        //std::cout << "pls:\n" << pls << "\n" << std::endl;
+        size_t begin = 0; size_t end = input.find_first_of("\n", begin);
+        while(true){
+            //std::cout << "b: " << begin << ", e: " << end << ", eof: " << (end==std::string::npos) << std::endl;
+            std::string line = input.substr(begin, end == std::string::npos ? std::string::npos : end - begin);
+            //std::cout << "line: '" << line << "'" << std::endl;
+            const std::string whitespace = " \t";
+            size_t white_begin = line.find_first_not_of(whitespace);
+            if(white_begin == std::string::npos) white_begin = 0;
+            size_t white_end = line.find_last_not_of(whitespace);
+            if(white_end == std::string::npos) white_end = line.size();
+            else white_end += 1;
+            std::string line_stripped = line.substr(white_begin, white_end - white_begin);
+            //std::cout << "b: " << white_begin << ", e: " << white_end << std::endl;
+            //std::cout << "line_stripped: '" << line_stripped << "'" << std::endl;
+
+            if(!line_stripped.empty() && line_stripped.compare(0, std::string("File").size(), std::string("File")) == 0){
+                size_t equal_pos = line_stripped.find("=", std::string("File1").size());
+                //std::cout << "equal_pos: " << equal_pos << std::endl;
+                if(equal_pos != std::string::npos){
+                    result.push_back(line_stripped.substr(equal_pos + 1));
+                }
             }
 
             if(end == std::string::npos){
@@ -243,6 +280,9 @@ private:
 
         if(strategy == Strategy::m3u){
             urls = parse_m3u(playlist);
+        }
+        else if(strategy == Strategy::pls){
+            urls = parse_pls(playlist);
         }
 
         if (urls.empty()){
@@ -384,8 +424,11 @@ public:
                     else if(strategy_string == "m3u"){
                         station_strategy = Station::Strategy::m3u;
                     }
+                    else if(strategy_string == "pls"){
+                        station_strategy = Station::Strategy::pls;
+                    }
                     else{
-                        std::cerr << "Station " << station_identifier << "'s strategy is invald. It must either be 'direct' or 'm3u'." << std::endl;
+                        std::cerr << "Station " << station_identifier << "'s strategy is invald. It must either be 'direct', 'm3u' or 'pls'." << std::endl;
                         return(EXIT_FAILURE);
                     }
                 }

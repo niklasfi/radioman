@@ -8,7 +8,7 @@ destinationPath = "/tmp/feedme-core-media/"
 #   - duration is an integer indicating the length of the recording in minutes
 # - a station is a three-tuple: ( identifier, strategy, url, programmes)
 #   - identifier is a string (needs not be unique). It is used in logging outputs and in combination with the programme identifier to determine the output paths for recordings
-#   - strategy is either "direct" or "m3u" indicating either a direct download (the provided url points directly to an mp3 stream) or an m3u playlist.
+#   - strategy is either "direct", "m3u" or "pls" indicating either a direct download (the provided url points directly to an mp3 stream) or an m3u or pls playlist.
 #   - url is a string pointing to the stream or m3u playlist.
 #   - programmes is a list of programmes
 
@@ -37,7 +37,10 @@ schedule: (
       ("1minute", "0S", 2),
       ("Nachrichten", "0M", 5)
     )),
-    ("bbc-r1", "direct", "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1_mf_p", (
+    ("antenne-bayern", "m3u", "http://www.antenne.de/webradio/antenne.m3u", (
+      ("1minute", "0S", 2)
+    )),
+    ("bbc-r1", "pls", "http://www.bbc.co.uk/worldservice/meta/live/mp3/eneuk.pls", (
       ("1minute", "0S", 2)
     ))
 )
