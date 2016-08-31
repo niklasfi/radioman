@@ -36,6 +36,9 @@ schedule: (
     ("1live", "m3u", "http://www.wdr.de/wdrlive/media/einslive.m3u", (
       ("1minute", "0S", 2),
       ("Nachrichten", "0M", 5)
+    )),
+    ("bbc-r1", "direct", "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio1_mf_p", (
+      ("1minute", "0S", 2)
     ))
 )
 
