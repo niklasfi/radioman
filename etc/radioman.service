@@ -1,12 +1,12 @@
 [Unit]
-Description=feedme-core (the radio stream downloader)
+Description=radioman (the radio stream downloader)
 After=syslog.target network.target
 
 [Service]
 Type=simple
 User=niklas
 Group=niklas
-ExecStart=/var/www/feedme-core/bin/feedme-core /var/www/feedme-core/etc/config.production
+ExecStart=/var/www/radioman/bin/radioman /var/www/radioman/etc/config.production
 StandardOutput=journal
 Restart=always
 

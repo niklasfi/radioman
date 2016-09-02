@@ -1,8 +1,8 @@
-# feedme-core (web-)radio recorder
+# radioman (web-)radio recorder
 
 ## What does it do?
 
-Are you tired of your favourite radio shows still not providing a podcast service? Is your favourite music only played at nighttime? feedme-core allows you to record just about any radio webstream that syndicates mp3 streams either directly or via m3u or pls playlists (which should be just about every station) according to a predefined schedule.
+Are you tired of your favourite radio shows still not providing a podcast service? Is your favourite music only played at nighttime? radioman allows you to record just about any radio webstream that syndicates mp3 streams either directly or via m3u or pls playlists (which should be just about every station) according to a predefined schedule.
 
 ### Features
 
@@ -49,13 +49,13 @@ If you want to find a stream for a particular radio station it is often helpful 
 
 ### Clone the repository
 
-You know how to do this! Just `git clone https://github.com/niklasfi/feedme-core.git`.
+You know how to do this! Just `git clone https://github.com/niklasfi/radioman.git`.
 
 ### Installing the prerequisites
 
 #### Build Tools
 
-To build feedme-core, all you need is a c++ compiler of your choice (`clang++` and `g++` come to mind) and `cmake`. You will find them in your distributions package manager.
+To build radioman, all you need is a c++ compiler of your choice (`clang++` and `g++` come to mind) and `cmake`. You will find them in your distributions package manager.
 
 #### Libraries
 
@@ -75,29 +75,29 @@ Edit one of the `etc/config.*` files, or create one of your own. The sample conf
 
 ### Runing
 
-Running feedme-core is pretty simple. Just pass your config file as a parameter to the main executable
+Running radioman is pretty simple. Just pass your config file as a parameter to the main executable
 
-    bin/feedme-core path/to/your/config
+    bin/radioman path/to/your/config
 
 ### Registering as a systemd service
 
-There is a sample systemd service file in the `etc` directory. You can adapt it to your needs by changing the `User` and `Group` as well as the path to the binary and config in the `ExecStart` setting. Once you are done, copy it to `etc/systemd/system/feedme-core.service` or create a symlink pointing to your local service file in this location. Finally you need to tell systemd to reload its configuration files by executing `sudo systemctl daemon-reload`.
+There is a sample systemd service file in the `etc` directory. You can adapt it to your needs by changing the `User` and `Group` as well as the path to the binary and config in the `ExecStart` setting. Once you are done, copy it to `etc/systemd/system/radioman.service` or create a symlink pointing to your local service file in this location. Finally you need to tell systemd to reload its configuration files by executing `sudo systemctl daemon-reload`.
 
-To start the feedme-core service, call
+To start the radioman service, call
 
-    sudo systemctl start feedme-core
+    sudo systemctl start radioman
 
-You can check the status of the feedme-core service with
+You can check the status of the radioman service with
 
     sudo systemctl status feedme core
 
-To ensure the feedme-core service is run at startup you need to enable it. To do so:
+To ensure the radioman service is run at startup you need to enable it. To do so:
 
-    sudo systemctl enable feedme-core
+    sudo systemctl enable radioman
 
-If you kept the `StandardOutput` setting in your service file, you can follow feedme-core's logs using
+If you kept the `StandardOutput` setting in your service file, you can follow radioman's logs using
 
-    sudo journalctl -u feedme-core -f -o cat
+    sudo journalctl -u radioman -f -o cat
 
 ## Isn't this totally overengineered?
 
