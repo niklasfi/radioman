@@ -9,7 +9,7 @@
 
 namespace NextFunctor{
     using boost::posix_time::ptime;
-    
+
     class Base{
     protected:
         virtual std::ostream& ostream_operator(std::ostream& os) const = 0;
@@ -20,10 +20,10 @@ namespace NextFunctor{
         friend std::ostream& operator<<(std::ostream& os, const Base& base){
             return base.ostream_operator(os);
         }
-        
+
         static std::shared_ptr<Base> parse(const std::string& str);
     };
-    
+
     class Month: public Base{
     public:
         using source_t = boost::date_time::months_of_year;
@@ -84,7 +84,7 @@ namespace NextFunctor{
     private:
         source_t month;
     };
-    
+
     class DayOfMonth: public Base{
     public:
         using source_t = int;
@@ -101,7 +101,7 @@ namespace NextFunctor{
     private:
         source_t dayofmonth;
     };
-    
+
     class DayOfWeek: public Base{
     public:
         using source_t = boost::date_time::weekdays;
@@ -135,11 +135,11 @@ namespace NextFunctor{
                     break;
             };
             return os;
-        }        
+        }
     private:
         source_t dayofweek;
     };
-    
+
     class Hour: public Base{
     public:
         using source_t = int;
@@ -156,7 +156,7 @@ namespace NextFunctor{
     private:
         source_t hour;
     };
-    
+
     class Minute: public Base{
     public:
         using source_t = int;
@@ -173,7 +173,7 @@ namespace NextFunctor{
     private:
         source_t minute;
     };
-    
+
     class Second: public Base{
     public:
         using source_t = int;
@@ -190,7 +190,7 @@ namespace NextFunctor{
     private:
         source_t second;
     };
-  
+
     class AllOf: public Base{
     public:
         using element_t = std::shared_ptr<Base>;
@@ -213,7 +213,7 @@ namespace NextFunctor{
     private:
         source_t conditions;
     };
-    
+
     class FirstOf: public Base{
     public:
         using element_t = std::shared_ptr<Base>;
