@@ -4,14 +4,8 @@
 #include <iostream>
 #include <stack>
 
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/home/x3.hpp>
-
 #include <boost/fusion/algorithm.hpp>
-
-#include <boost/version.hpp>
-
-#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/spirit/home/x3.hpp>
 
 namespace client {
     namespace parser {
