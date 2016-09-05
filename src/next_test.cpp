@@ -166,4 +166,25 @@ int main(){
 
         std::cout << "OK\n\n";
     }
+
+    {
+        std::cout << "=== TEST f7 (whitespace in parse string) ===\n\n";
+
+        f_ptr f(Base::parse("(WED & [ 13H | 4H ] & 5M    )"));
+        std::cout << *f << "\n";
+
+        ptime d1(date(2016, moy::Aug, 31), hours(4) + minutes(5));
+        ptime d1r((*f)(d1, true));
+
+        std::cout << "d1: " << d1 << "\td1r:  " << d1r << "\n";
+        assert(d1r == ptime(date(2016, moy::Aug, 31), hours(13)+ minutes(5)));
+
+        ptime d2(date(2016, moy::Aug, 31), hours(4));
+        ptime d2r((*f)(d2, true));
+
+        std::cout << "d2: " << d2 << "\td2r:  " << d2r << "\n";
+        assert(d2r == ptime(date(2016, moy::Aug, 31), hours(4)+ minutes(5)));
+
+        std::cout << "OK\n\n";
+    }
 }

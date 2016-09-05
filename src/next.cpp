@@ -7,6 +7,8 @@
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/home/x3.hpp>
 
+#include <boost/fusion/algorithm.hpp>
+
 #include <boost/version.hpp>
 
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -89,12 +91,20 @@ namespace client {
         };
 
         auto allof_f = [](auto& ctx){
-            auto& vec = _attr(ctx);
+            auto& fusion_deque = _attr(ctx);
+            auto filtered = boost::fusion::filter<std::vector<std::shared_ptr<NextFunctor::Base>>>(fusion_deque);
+
+            std::vector<std::shared_ptr<NextFunctor::Base>> vec;
+            for_each(filtered, [&](auto& obj){vec.insert(vec.end(), obj.begin(), obj.end());});
             _val(ctx) = std::shared_ptr<NextFunctor::Base>(new NextFunctor::AllOf(vec.begin(), vec.end()));
         };
 
         auto firstof_f = [](auto& ctx){
-            auto& vec = _attr(ctx);
+            auto& fusion_deque = _attr(ctx);
+            auto filtered = boost::fusion::filter<std::vector<std::shared_ptr<NextFunctor::Base>>>(fusion_deque);
+
+            std::vector<std::shared_ptr<NextFunctor::Base>> vec;
+            for_each(filtered, [&](auto& obj){vec.insert(vec.end(), obj.begin(), obj.end());});
             _val(ctx) = std::shared_ptr<NextFunctor::Base>(new NextFunctor::FirstOf(vec.begin(), vec.end()));
         };
 
@@ -125,8 +135,8 @@ namespace client {
         auto const cond_proxy_def = month | dayofweek | hour | minute | second | hour_minute | allof | firstof;
         auto const cond_def = cond_proxy;
 
-        auto const allof_def = (lit("(") >> (cond_def % (*blank >> '&' >> *blank)) >> lit(")"))[allof_f];
-        auto const firstof_def = (lit("[") >> (cond_def % (*blank >> '|' >> *blank)) >> lit("]"))[firstof_f];
+        auto const allof_def = (lit("(") >> (*blank) >> (cond_def % (*blank >> '&' >> *blank)) >> (*blank) >> lit(")"))[allof_f];
+        auto const firstof_def = (lit("[") >> (*blank) >> (cond_def % (*blank >> '|' >> *blank)) >> (*blank) >> lit("]"))[firstof_f];
 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored  "-Wunused-parameter"
